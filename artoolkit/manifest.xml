@@ -1,0 +1,14 @@
+<package>
+	<description brief="artoolkit">
+	     Artoolkit
+	</description>
+	<author>Gautier Dumonteil</author>
+	<license>BSD</license>
+	
+	<review status="3rdparty" notes=""/>
+	<url>http://www.hitl.washington.edu/artoolkit/</url>
+	<versioncontrol type="svn" url="https://artoolkit.svn.sourceforge.net/svnroot/artoolkit/trunk"/>
+	<export>
+  		<cpp cflags="-I${prefix}/include/ -I${prefix}/include/AR/sys" lflags="-L${prefix}/lib -Wl,-rpath,${prefix}/lib"/>
+	</export>
+</package>

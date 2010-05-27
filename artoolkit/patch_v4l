@@ -1,0 +1,296 @@
+#!/bin/sh
+# ARToolKit Configure for Linux/Unix Video Devices
+#
+#####################################################
+
+MDIR=". \
+      lib/SRC \
+      lib/SRC/AR \
+      lib/SRC/ARMulti \
+      lib/SRC/Gl \
+      lib/SRC/VideoLinux1394Cam \
+      lib/SRC/VideoLinuxDV \
+      lib/SRC/VideoLinuxV4L \
+      lib/SRC/VideoSGI \
+      lib/SRC/VideoMacOSX \
+      lib/SRC/VideoGStreamer \
+      lib/SRC/ARvrml \
+      util \
+      util/calib_camera2 \
+      util/calib_cparam \
+      util/calib_distortion \
+      util/mk_patt \
+      util/graphicsTest \
+      util/videoTest \
+      examples \
+      examples/collide \
+      examples/exview \
+      examples/loadMultiple \
+      examples/modeTest \
+      examples/multi \
+      examples/optical \
+      examples/paddle \
+      examples/paddleDemo \
+      examples/paddleInteraction \
+      examples/range \
+      examples/relation \
+      examples/simple \
+      examples/simple2 \
+      examples/simpleLite \
+      examples/twoView \
+      examples/simpleVRML \
+      "
+
+SED=/tmp/SED.$$
+trap "rm -f $SED; exit 0" 0 1 2 3 15
+VERSION=`grep -E 'AR_HEADER_VERSION_STRING[[:space:]]+"[0-9]+\.[0-9]+(\.[0-9]+)*"' include/AR/config.h.in | grep -Eo "[0-9]+\.[0-9]+(\.[0-9]+)*"`
+
+
+E=`uname`
+if [ "$E" = "Linux" ]
+then
+    echo "Select a video capture driver."
+    echo "  1: Video4Linux"
+    echo "  2: Video4Linux+JPEG Decompression (EyeToy)"
+    echo "  3: Digital Video Camcoder through IEEE 1394 (DV Format)"
+    echo "  4: Digital Video Camera through IEEE 1394 (VGA NONCOMPRESSED Image Format)"
+    echo "  5: GStreamer Media Framework"
+    echo -n "Enter : "
+    #read ANS
+    ANS=$1
+    if [ "$ANS" = "1" ]
+    then
+		echo
+		echo "Color conversion should use x86 assembly (choose 'n' for 64bit systems)?"
+		echo -n "Enter : "
+		#read ANS
+		ANS=$2
+		if [ "$ANS" = "y" ]
+		then
+			CCVT_OBJ="ccvt_i386.o"
+		elif [ "$ANS" = "n" ]
+		then
+			CCVT_OBJ="ccvt_c.o"
+		else
+			echo "Please enter y or n."
+			exit 0
+		fi	
+        VIDEO_DRIVER="VideoLinuxV4L"
+        CFLAG="-O -I/usr/X11R6/include -I/usr/src/linux-headers-"$(uname -r)"/include"
+        LDFLAG="-L/usr/X11R6/lib"
+        ARFLAG="rs"
+        RANLIB=""
+        LIBS="-lglut -lGLU -lGL -lXi -lX11 -lm -lpthread"
+        CONFIG="AR_INPUT_V4L"
+    elif [ "$ANS" = "2" ]
+    then
+		echo
+		echo "Color conversion should use x86 assembly (Answer n if compiling for 64 bit)?"
+		echo -n "Enter : "
+		read ANS
+		if [ "$ANS" = "y" ]
+		then
+			CCVT_OBJ="ccvt_i386.o"
+		elif [ "$ANS" = "n" ]
+		then
+			CCVT_OBJ="ccvt_c.o"
+		else
+			echo "Please enter y or n."
+			exit 0
+		fi		
+        VIDEO_DRIVER="VideoLinuxV4L"
+        CFLAG="-O -I/usr/X11R6/include -DUSE_EYETOY"
+        LDFLAG="-L/usr/X11R6/lib"
+        ARFLAG="rs"
+        RANLIB=""
+        LIBS="-lglut -lGLU -lGL -lXi -lX11 -lm -lpthread -ljpeg"
+        CONFIG="AR_INPUT_V4L"
+    elif [ "$ANS" = "3" ]
+    then
+        VIDEO_DRIVER="VideoLinuxDV"
+        CFLAG="-O -I/usr/X11R6/include"
+        LDFLAG="-L/usr/X11R6/lib"
+        ARFLAG="rs"
+        RANLIB=""
+        LIBS="-lglut -lGLU -lGL -lXi -lX11 -lm -lpthread -lraw1394 -ldv"
+        CONFIG="AR_INPUT_DV"
+    elif [ "$ANS" = "4" ]
+    then
+        VIDEO_DRIVER="VideoLinux1394Cam"
+        CFLAG="-O -I/usr/X11R6/include"
+        LDFLAG="-L/usr/X11R6/lib"
+        ARFLAG="rs"
+        RANLIB=""
+        LIBS="-lglut -lGLU -lGL -lXi -lX11 -lm -lpthread -lraw1394 -ldc1394_control"
+        CONFIG="AR_INPUT_1394CAM"
+    elif [ "$ANS" = "5" ]
+    then
+        VIDEO_DRIVER="VideoGStreamer"
+		CFLAG="-O -I/usr/X11R6/include -fPIC"
+        LDFLAG="-L/usr/X11R6/lib"
+        ARFLAG="rs"
+        RANLIB=""
+        LIBS="-lglut -lGLU -lGL -lXi -lX11 -lm -lpthread"
+        CONFIG="AR_INPUT_GSTREAMER"
+        GST_CFLAGS=`pkg-config --cflags gstreamer-0.10`
+		GST_LIBS=`pkg-config --libs gstreamer-0.10`
+        CFLAG="$CFLAG $GST_CFLAGS"
+        LIBS="$LIBS $GST_LIBS"
+    else
+        echo "Please enter 1,2,3,4 or 5."
+        exit 0
+    fi
+	# Asking for debug mode (assumes gcc)
+	echo "Do you want to create debug symbols? (y or n)"
+    echo -n "Enter : "
+    #read ANS
+    ANS=$3
+    if [ "$ANS" = "y" ]
+    then
+        CFLAG="$CFLAG -g"
+    elif [ "$ANS" = "n" ]
+    then
+        CFLAG="$CFLAG"
+    else
+        echo "Please enter y or n."
+        exit 0
+    fi	
+elif [ "$E" = "IRIX" ]
+then
+    VIDEO_DRIVER="VideoSGI"
+    CFLAG="-O -n32"
+    LDFLAG="-n32"
+    ARFLAG="rs"
+    RANLIB=""
+    LIBS="-lglut -lGLU -lGL -lXmu -lX11 -lvl -lm"
+elif [ "$E" = "IRIX64" ]
+then
+    VIDEO_DRIVER="VideoSGI"
+    CFLAG="-O -n32"
+    LDFLAG="-n32"
+    ARFLAG="rs"
+    RANLIB=""
+    LIBS="-lglut -lGLU -lGL -lXmu -lX11 -lvl -lm"
+elif [ "$E" = "Darwin" ]
+then
+    VIDEO_DRIVER="VideoMacOSX"
+    CFLAG="-O"
+    LDFLAG=""
+    ARFLAG="-r"
+    RANLIB="ranlib \$\@"
+    LIBS="-framework Carbon -framework QuickTime -framework GLUT -framework OpenGL -framework Cocoa"
+
+    echo "Does your Mac have fast texture mapping hardware? (y or n)"
+    echo -n "Enter : "
+    read ANS
+    if [ "$ANS" = "y" ]
+    then
+        APPLE_FAST_TEX="y"
+    elif [ "$ANS" = "n" ]
+    then
+        APPLE_FAST_TEX="n"
+    else
+        echo "Please enter y or n."
+        exit 0
+    fi
+else
+    echo "This configure command supports Linux, IRIX and MacOSX."
+    exit 0
+fi
+
+echo "Build gsub libraries with texture rectangle support? (y or n)"
+echo "GL_NV_texture_rectangle is supported on most NVidia graphics cards"
+echo "and on ATi Radeon and better graphics cards"
+echo -n "Enter : "
+#read ANS
+ANS=$4
+if ( [ "$ANS" = "y" ] || [ "$ANS" = "Y" ] ||  [ "$ANS" = "yes" ] || [ "$ANS" = "YES" ])
+then
+    NVEXT="y"
+elif ( [ "$ANS" = "n" ] || [ "$ANS" = "N" ] ||  [ "$ANS" = "no" ] || [ "$ANS" = "NO" ])
+
+then
+    NVEXT="n"
+else
+    echo "Please enter y or n."
+    exit 0
+fi
+
+#
+# Output step 1.
+# Create Makefiles, setting symbols, and selecting directories for compilation.
+#
+
+# Prefix any slashes with '\' for sed.
+echo $VIDEO_DRIVER | sed -e 's/\//\\\//g' >$SED
+VIDEO_DRIVER=`cat $SED`
+echo $CFLAG | sed -e 's/\//\\\//g' >$SED
+CFLAG=`cat $SED`
+echo $LDFLAG | sed -e 's/\//\\\//g' >$SED
+LDFLAG=`cat $SED`
+echo $ARFLAG | sed -e 's/\//\\\//g' >$SED
+ARFLAG=`cat $SED`
+echo $RANLIB | sed -e 's/\//\\\//g' >$SED
+RANLIB=`cat $SED`
+echo $LIBS | sed -e 's/\//\\\//g' >$SED
+LIBS=`cat $SED`
+echo $CCVT_OBJ | sed -e 's/\//\\\//g' >$SED
+CCVT_OBJ=`cat $SED`
+
+cat > $SED <<EOF
+s/@VIDEO_DRIVER@/$VIDEO_DRIVER/
+s/@CFLAG@/$CFLAG/
+s/@LDFLAG@/$LDFLAG/
+s/@ARFLAG@/$ARFLAG/
+s/@RANLIB@/$RANLIB/
+s/@LIBS@/$LIBS/
+s/@CCVT_OBJ@/$CCVT_OBJ/
+EOF
+
+
+for i in $MDIR
+do
+    echo "  create $i/Makefile"
+    sed -f $SED <$i/Makefile.in > $i/Makefile
+done
+echo "  create share/artoolkit-config"
+sed -f $SED <share/artoolkit-config.in > share/artoolkit-config
+chmod ugo+rx share/artoolkit-config
+
+#
+# Output step 2.
+# Record configuration in config.h.
+#
+
+if [ "$NVEXT" = "y" ]
+then
+cat > $SED <<EOF
+s/#undef    AR_OPENGL_TEXTURE_RECTANGLE/#define    AR_OPENGL_TEXTURE_RECTANGLE/
+EOF
+elif [ "$NVEXT" = "n" ]
+then
+cat > $SED <<EOF
+s/#undef    AR_OPENGL_TEXTURE_RECTANGLE/#undef    AR_OPENGL_TEXTURE_RECTANGLE/
+EOF
+fi
+
+if [ "$APPLE_FAST_TEX" = "y" ]
+then
+cat >> $SED <<EOF
+s/#undef    APPLE_TEXTURE_FAST_TRANSFER/#define   APPLE_TEXTURE_FAST_TRANSFER/
+EOF
+fi
+
+if [ $CONFIG ]
+then
+UNDEF="#undef  $CONFIG"
+DEF="#define  $CONFIG"
+cat >> $SED <<EOF
+s/$UNDEF/$DEF/
+EOF
+fi
+
+echo "  create include/AR/config.h"
+sed -f $SED <include/AR/config.h.in > include/AR/config.h
+
+echo "Done."
