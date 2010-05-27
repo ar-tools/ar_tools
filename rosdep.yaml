@@ -7,3 +7,5 @@ glut:
   fedora: freeglut-devel
   arch: freeglut
   gentoo: freeglut
+libosmgpsmap:
+  ubuntu: libosmgpsmap0 libosmgpsmap-dev
