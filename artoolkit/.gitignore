@@ -1,5 +1,7 @@
 build/
 bin/
 lib/
+include/
 *~
-Makefile
+patched
+installed
