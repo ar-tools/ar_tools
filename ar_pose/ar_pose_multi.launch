@@ -1,0 +1,21 @@
+<launch>
+	<node pkg="rviz" type="rviz" name="rviz"/>
+
+	<node pkg="tf" type="static_transform_publisher" name="world_to_usb_cam"
+		args="0.0 0.0 0.0 0.7071 0.0 0.0 0.7071 world usb_cam 100" />
+
+	<node name="usb_cam" pkg="usb_cam" type="usb_cam_node" respawn="false" output="log">
+		<param name="video_device" type="string" value="/dev/video1"/>
+		<param name="io_method" type="string" value="mmap"/>
+		<param name="image_width" type="int" value="640"/>
+		<param name="image_height" type="int" value="480"/>
+		<param name="pixel_format" type="string" value="mjpeg"/>
+	</node>
+
+	<node name="ar_pose" pkg="ar_pose" type="ar_multi" respawn="false" output="screen">
+		<param name="camera_image_topic" type="string" value="/usb_cam/image_raw"/>
+		<param name="camera_info_topic" type="string" value="/usb_cam/camera_info"/>
+		<param name="marker_pattern_list" type="string" value="Data/object_4x4"/>
+		<param name="threshold" type="int" value="100"/>
+	</node>
+</launch>
