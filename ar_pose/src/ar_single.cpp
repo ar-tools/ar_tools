@@ -106,6 +106,8 @@ namespace ar_pose
     getCamInfo_ = false;
     
     armarker_pub_ = n_.advertise<ar_pose::ARMarker>("ar_pose_marker", 0);
+
+    rviz_marker_pub_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 0);
     shape = visualization_msgs::Marker::CUBE;
   }
 
@@ -229,7 +231,7 @@ namespace ar_pose
       ROS_DEBUG (" QUAT: Pos x: %3.1f  y: %3.1f  z: %3.1f", pos[0], pos[1], pos[2]);
       ROS_DEBUG ("     Quat qx: %3.2f qy: %3.2f qz: %3.2f qw: %3.2f", quat[0], quat[1], quat[2], quat[3]);
 
-		ar_pose_marker_.header.frame_id = "usb_cam";
+		ar_pose_marker_.header.frame_id = "head_camera";
 		ar_pose_marker_.header.stamp = ros::Time::now();
 		ar_pose_marker_.id = marker_info->id;
 		ar_pose_marker_.pose.pose.position.x = pos[0] / 1000;
@@ -248,7 +250,7 @@ namespace ar_pose
 		
 		if(tf_publisher_)
 		{
-			transform_.header.frame_id = "usb_cam";
+			transform_.header.frame_id = "head_camera";
 			transform_.header.stamp = ros::Time::now();
 			transform_.child_frame_id = "ar_single";
 			transform_.transform.translation.x = pos[0] / 1000;
@@ -263,7 +265,7 @@ namespace ar_pose
 			broadcaster_.sendTransform (transform_);
 			ROS_DEBUG ("Published ar_single tf ");
 			
-			rviz_marker_.header.frame_id = "/myframe";
+			rviz_marker_.header.frame_id = "head_camera ";
 			rviz_marker_.header.stamp = ros::Time::now();
 			rviz_marker_.ns = "basic_shapes";
 			rviz_marker_.id = 1;
@@ -276,16 +278,16 @@ namespace ar_pose
 			rviz_marker_.pose.orientation.y = quat[1];
 			rviz_marker_.pose.orientation.z = quat[2];
 			rviz_marker_.pose.orientation.w = quat[3];
-			rviz_marker_.scale.x = 1.0;
-			rviz_marker_.scale.y = 1.0;
-			rviz_marker_.scale.z = 1.0;
+			rviz_marker_.scale.x = 0.1;
+			rviz_marker_.scale.y = 0.1;
+			rviz_marker_.scale.z = 0.01;
 			rviz_marker_.color.r = 0.0f;
 			rviz_marker_.color.g = 1.0f;
 			rviz_marker_.color.b = 0.0f;
 			rviz_marker_.color.a = 1.0;
 			rviz_marker_.lifetime = ros::Duration();
 			
-			//rviz_marker_pub_.publish(rviz_marker_);
+			rviz_marker_pub_.publish(rviz_marker_);
 			ROS_DEBUG ("Published rviz_marker tf ");
 		}
     }
