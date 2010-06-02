@@ -8,6 +8,7 @@
   <url>http://robotics.ccny.cuny.edu/wiki/Software/ROS/ar_pose</url>
 
   <rosdep name="glut"/>
+  <depend package="visualization_msgs"/>
   <depend package="artoolkit"/>
   <depend package="geometry_msgs"/>
   <depend package="tf"/>

@@ -98,9 +98,15 @@ namespace ar_pose
     n_param.param ("history_mode", history_mode, 1);
     ROS_INFO ("History_mode %d", history_mode);
 
+    n_param.param ("tf_publisher", tf_publisher_, 1);
+    ROS_INFO ("Tf publisher %d", tf_publisher_);
+
     ROS_INFO ("Subscribing to info topic");
     sub_ = n_.subscribe (camera_info_topic_, 1, &ARSinglePublisher::camInfoCallback, this);
     getCamInfo_ = false;
+    
+    armarker_pub_ = n_.advertise<ar_pose::ARMarker>("ar_pose_marker", 0);
+    shape = visualization_msgs::Marker::CUBE;
   }
 
   ARSinglePublisher::~ARSinglePublisher (void)
@@ -223,20 +229,65 @@ namespace ar_pose
       ROS_DEBUG (" QUAT: Pos x: %3.1f  y: %3.1f  z: %3.1f", pos[0], pos[1], pos[2]);
       ROS_DEBUG ("     Quat qx: %3.2f qy: %3.2f qz: %3.2f qw: %3.2f", quat[0], quat[1], quat[2], quat[3]);
 
-      transform_.header.frame_id = "usb_cam";
-      transform_.child_frame_id = "ar_single";
-      transform_.header.stamp = ros::Time::now ();
-      transform_.transform.translation.x = pos[0] / 1000;
-      transform_.transform.translation.y = pos[1] / 1000;
-      transform_.transform.translation.z = pos[2] / 1000;
+		ar_pose_marker_.header.frame_id = "usb_cam";
+		ar_pose_marker_.header.stamp = ros::Time::now();
+		ar_pose_marker_.id = marker_info->id;
+		ar_pose_marker_.pose.pose.position.x = pos[0] / 1000;
+		ar_pose_marker_.pose.pose.position.y = pos[1] / 1000;
+		ar_pose_marker_.pose.pose.position.z = pos[2] / 1000;
 
-      transform_.transform.rotation.x = quat[0];
-      transform_.transform.rotation.y = quat[1];
-      transform_.transform.rotation.z = quat[2];
-      transform_.transform.rotation.w = quat[3];
+		ar_pose_marker_.pose.pose.orientation.x = quat[0];
+		ar_pose_marker_.pose.pose.orientation.y = quat[1];
+		ar_pose_marker_.pose.pose.orientation.z = quat[2];
+		ar_pose_marker_.pose.pose.orientation.w = quat[3];
+		
+		ar_pose_marker_.confidence = marker_info->cf;
 
-      broadcaster_.sendTransform (transform_);
-      ROS_DEBUG ("ar_single tf published");
+		armarker_pub_.publish(ar_pose_marker_);
+		ROS_DEBUG ("Published ar_single marker ");
+		
+		if(tf_publisher_)
+		{
+			transform_.header.frame_id = "usb_cam";
+			transform_.header.stamp = ros::Time::now();
+			transform_.child_frame_id = "ar_single";
+			transform_.transform.translation.x = pos[0] / 1000;
+			transform_.transform.translation.y = pos[1] / 1000;
+			transform_.transform.translation.z = pos[2] / 1000;
+
+			transform_.transform.rotation.x = quat[0];
+			transform_.transform.rotation.y = quat[1];
+			transform_.transform.rotation.z = quat[2];
+			transform_.transform.rotation.w = quat[3];
+
+			broadcaster_.sendTransform (transform_);
+			ROS_DEBUG ("Published ar_single tf ");
+			
+			rviz_marker_.header.frame_id = "/myframe";
+			rviz_marker_.header.stamp = ros::Time::now();
+			rviz_marker_.ns = "basic_shapes";
+			rviz_marker_.id = 1;
+			rviz_marker_.type = shape;
+			rviz_marker_.action = visualization_msgs::Marker::ADD;
+			rviz_marker_.pose.position.x = pos[0] / 1000;
+			rviz_marker_.pose.position.y = pos[1] / 1000;
+			rviz_marker_.pose.position.z = pos[2] / 1000;
+			rviz_marker_.pose.orientation.x = quat[0];
+			rviz_marker_.pose.orientation.y = quat[1];
+			rviz_marker_.pose.orientation.z = quat[2];
+			rviz_marker_.pose.orientation.w = quat[3];
+			rviz_marker_.scale.x = 1.0;
+			rviz_marker_.scale.y = 1.0;
+			rviz_marker_.scale.z = 1.0;
+			rviz_marker_.color.r = 0.0f;
+			rviz_marker_.color.g = 1.0f;
+			rviz_marker_.color.b = 0.0f;
+			rviz_marker_.color.a = 1.0;
+			rviz_marker_.lifetime = ros::Duration();
+			
+			//rviz_marker_pub_.publish(rviz_marker_);
+			ROS_DEBUG ("Published rviz_marker tf ");
+		}
     }
     else
     {

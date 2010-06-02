@@ -31,18 +31,20 @@
 #include <AR/video.h>
 
 #include <ros/ros.h>
+#include <ros/package.h>
+#include <ros/console.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <tf/transform_broadcaster.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <visualization_msgs/Marker.h>
+#include <resource_retriever/retriever.h>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 #include <cv_bridge/CvBridge.h>
 
-#include <ros/package.h>
-#include <ros/console.h>
-#include <resource_retriever/retriever.h>
+#include <ar_pose/ARMarker.h>
 
 namespace ar_pose
 {
@@ -58,15 +60,20 @@ namespace ar_pose
     void camInfoCallback (const sensor_msgs::CameraInfoConstPtr &);
 
       ros::NodeHandle n_;
-      tf::TransformBroadcaster broadcaster_;
       ros::Subscriber sub_;
+      tf::TransformBroadcaster broadcaster_;
+      ros::Publisher armarker_pub_;
 
+		ros::Publisher rviz_marker_pub_;
       geometry_msgs::TransformStamped transform_;
+      ar_pose::ARMarker ar_pose_marker_;
       image_transport::ImageTransport it_;
       image_transport::Subscriber cam_sub_;
       sensor_msgs::CvBridge bridge_;
       sensor_msgs::CameraInfo cam_info_;
+      visualization_msgs::Marker rviz_marker_;
 
+    uint32_t shape; 
     ARParam cam_param_;         // Camera Calibration Parameters
     int patt_id_;               // AR Marker Pattern
     char camera_image_topic_[FILENAME_MAX];
@@ -77,7 +84,7 @@ namespace ar_pose
     double marker_center_[2];   // Physical Center of the Marker
     double marker_trans_[3][4]; // Marker Transform
     int xsize_, ysize_;
-    int threshold_;
+    int threshold_, tf_publisher_;
     int history_mode, contF;
     bool getCamInfo_;
     CvSize sz_;
