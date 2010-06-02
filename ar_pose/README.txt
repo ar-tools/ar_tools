@@ -41,7 +41,11 @@ Then, in a shell:
 	
 Run the examples:
 	roscd ar_pose/
-	roslaunch example/ar_single/example.launch
+	cd demo/ar_single/
+	./setup.sh
+	roslaunch demo.launch
 
 or/and
-	roslaunch example/ar_multi/example.launch
+	cd demo/ar_multi/
+	./setup.sh
+	roslaunch demo.launch
