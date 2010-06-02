@@ -20,8 +20,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AR_SINGLE_H
-#define AR_SINGLE_H
+#ifndef AR_POSE_AR_SINGLE_H
+#define AR_POSE_AR_SINGLE_H
+
+#include <string.h>
+#include <stdarg.h>
 
 #include <AR/param.h>
 #include <AR/ar.h>
@@ -37,58 +40,51 @@
 #include <opencv/highgui.h>
 #include <cv_bridge/CvBridge.h>
 
-#define DEFAULT_CAMERA_PARAM "Data/camera_para.dat"
-#define DEFAULT_PATTERN "Data/patt.hiro"
+#include <ros/package.h>
+#include <ros/console.h>
+#include <resource_retriever/retriever.h>
 
 namespace ar_pose
 {
-class ARSinglePublisher
-{
-public:
-   ARSinglePublisher(ros::NodeHandle &n);
-   ~ARSinglePublisher(void);
+  class ARSinglePublisher
+  {
+  public:
+    ARSinglePublisher (ros::NodeHandle & n);
+    ~ARSinglePublisher (void);
 
-private:
-   void arInit ();
-   void getTransformationCallback(const sensor_msgs::ImageConstPtr&);
-   void camInfoCallback(const sensor_msgs::CameraInfoConstPtr&);
-   	
-   ros::NodeHandle n_;
-   tf::TransformBroadcaster broadcaster_;
-   ros::Subscriber sub_;
-   
-   geometry_msgs::TransformStamped transform_;
-   image_transport::ImageTransport it_;
-   image_transport::Subscriber cam_sub_;
-   sensor_msgs::CvBridge bridge_;
-   sensor_msgs::CameraInfo cam_info_;
-   
-   // Camera Calibration Parameters
-   ARParam cam_param_;
-   
-   // AR Marker Pattern
-   int patt_id_;
-   
-   char camera_image_topic_[FILENAME_MAX];
-   char camera_info_topic_[FILENAME_MAX];
-   char cam_param_filename_[FILENAME_MAX];
-   char pattern_filename_[FILENAME_MAX];
-   // Size of the AR Marker in mm
-   double marker_width_;
-   // Physical Center of the Marker
-   double marker_center_[2];
-   // Marker Transform
-   double marker_trans_[3][4];
-   int xsize_, ysize_;
-   int threshold_;
-   int mode,contF;
-   bool getCamInfo_;  
-   bool knownPattern_;
-   CvSize sz;
-   IplImage* capture;
+  private:
+    void arInit ();
+    void getTransformationCallback (const sensor_msgs::ImageConstPtr &);
+    void camInfoCallback (const sensor_msgs::CameraInfoConstPtr &);
 
-  
-}; // end class ARSinglePublisher
-} //end namespace ar_pose
+      ros::NodeHandle n_;
+      tf::TransformBroadcaster broadcaster_;
+      ros::Subscriber sub_;
+
+      geometry_msgs::TransformStamped transform_;
+      image_transport::ImageTransport it_;
+      image_transport::Subscriber cam_sub_;
+      sensor_msgs::CvBridge bridge_;
+      sensor_msgs::CameraInfo cam_info_;
+
+    ARParam cam_param_;         // Camera Calibration Parameters
+    int patt_id_;               // AR Marker Pattern
+    char camera_image_topic_[FILENAME_MAX];
+    char camera_info_topic_[FILENAME_MAX];
+    char cam_param_filename_[FILENAME_MAX];
+    char pattern_filename_[FILENAME_MAX];
+    double marker_width_;       // Size of the AR Marker in mm
+    double marker_center_[2];   // Physical Center of the Marker
+    double marker_trans_[3][4]; // Marker Transform
+    int xsize_, ysize_;
+    int threshold_;
+    int history_mode, contF;
+    bool getCamInfo_;
+    CvSize sz_;
+    IplImage *capture_;
+
+
+  };                            // end class ARSinglePublisher
+}                               // end namespace ar_pose
 
 #endif

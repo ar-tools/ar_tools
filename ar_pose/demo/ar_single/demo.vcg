@@ -1,0 +1,24 @@
+Background\ ColorR=0
+Background\ ColorG=0
+Background\ ColorB=0
+Fixed\ Frame=/ar_single
+Target\ Frame=/world
+TF.All\ Enabled=1
+TF.Enabled=1
+TF.Show\ Arrows=1
+TF.Show\ Axes=1
+TF.Show\ Names=1
+TF.Update\ Rate=0
+Tool\ 2D\ Nav\ GoalTopic=goal
+Tool\ 2D\ Pose\ EstimateTopic=initialpose
+Camera\ Type=rviz::OrbitViewController
+Camera\ Config=1.181 3.42725 1.10592 0.00107399 0.00307787 -3.37756e-06
+Property\ Grid\ State=selection=Fixed Frame;expanded=.Global Options,TF.Enabled,TF./ar_single/ar_single,TF./usb_cam/usb_cam,TF./world/world,TF./worldTree/world,TF./usb_camTree/usb_cam,TF./ar_singleTree/ar_single;scrollpos=0,0;splitterpos=144,289;ispageselected=1
+[Display0]
+Name=TF
+Package=rviz
+ClassName=rviz::TFDisplay
+[TF.]
+ar_singleEnabled=1
+usb_camEnabled=1
+worldEnabled=1
