@@ -5,7 +5,7 @@
 	    args="-d $(find ar_pose)/demo/demo_single.vcg"/>
 
   <node pkg="tf" type="static_transform_publisher" name="world_to_cam" 
-    args="0 0 0.2 0 0 0 world usb_cam 1" />
+    args="0 0 0.5 -1.57 0 -1.57 world usb_cam 1" />
 
 	<node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false" output="screen">
 		<param name="marker_pattern" type="string" value="data/patt.hiro"/>
@@ -13,6 +13,7 @@
 		<param name="marker_center_x" type="double" value="0.0"/>
 		<param name="marker_center_y" type="double" value="0.0"/>
 		<param name="threshold" type="int" value="100"/>
+    <param name="use_history" type="bool" value="true"/>
 	</node>
 	
 	<node name="image_view" pkg="image_view" type="image_view" 
