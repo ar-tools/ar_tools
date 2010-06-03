@@ -1,7 +1,7 @@
 Background\ ColorR=0
 Background\ ColorG=0
 Background\ ColorB=0
-Fixed\ Frame=/world
+Fixed\ Frame=/usb_cam
 Target\ Frame=<Fixed Frame>
 Camera.Alpha=0.1
 Camera.Enabled=1
@@ -78,8 +78,8 @@ TF.Update\ Rate=0
 Tool\ 2D\ Nav\ GoalTopic=goal
 Tool\ 2D\ Pose\ EstimateTopic=initialpose
 Camera\ Type=rviz::OrbitViewController
-Camera\ Config=1.3576 1.65568 7.09961 0.174577 0.246575 -0.594872
-Property\ Grid\ State=selection=Grid3.Enabled;expanded=.Global Options,TF./usb_cam/usb_cam,TF./world/world,TF./ar_single/ar_single,TF.Enabled.TF.Tree,TF./worldTree/world,TF./usb_camTree/usb_cam,TF./ar_singleTree/ar_single,Markers.Enabled.Markers.StatusTopStatus,Markers.Enabled.Markers.Namespaces;scrollpos=0,0;splitterpos=160,322;ispageselected=1
+Camera\ Config=1.44636 0.696175 3.93974 0 0 0
+Property\ Grid\ State=selection=Fixed Frame;expanded=.Global Options,TF.Enabled,TF./usb_cam/usb_cam,TF./world/world,TF./ar_marker/ar_marker,TF.Enabled.TF.Tree,TF./worldTree/world,TF./usb_camTree/usb_cam,TF./ar_markerTree/ar_marker,Markers.Enabled.Markers.StatusTopStatus,Markers.Enabled.Markers.Namespaces,Camera.Enabled,Camera.Enabled.Camera.StatusTopStatus;scrollpos=0,0;splitterpos=238,477;ispageselected=1
 [Display0]
 Name=TF
 Package=rviz
@@ -109,6 +109,6 @@ Name=Grid
 Package=rviz
 ClassName=rviz::GridDisplay
 [TF.]
-ar_singleEnabled=1
+ar_markerEnabled=1
 usb_camEnabled=1
 worldEnabled=1
