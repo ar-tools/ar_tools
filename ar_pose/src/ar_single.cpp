@@ -56,6 +56,10 @@ namespace ar_pose
       threshold_ = 100;
     ROS_INFO ("\tThreshold: %d", threshold_);
 
+    if (!n_param.getParam("marker_width", markerWidth_))
+      markerWidth_ = 80.0;
+    ROS_INFO ("\tMarker Width: %.1f", markerWidth_);
+
     if (!n_param.getParam("marker_frame", markerFrame_))
       markerFrame_ = "ar_marker";
     ROS_INFO ("\tMarker frame: %s", markerFrame_.c_str());
@@ -76,9 +80,6 @@ namespace ar_pose
     n_param.param ("marker_pattern", local_path, std::string ("data/patt.hiro"));
     sprintf (pattern_filename_, "%s/%s", package_path.c_str (), local_path.c_str ());
     ROS_INFO ("\tMarker Pattern Filename: %s", pattern_filename_);
-
-    n_param.param ("marker_width", marker_width_, 80.0);
-    ROS_INFO ("\tMarker Width: %.1f", marker_width_);
 
     n_param.param ("marker_center_x", marker_center_[0], 0.0);
     n_param.param ("marker_center_y", marker_center_[1], 0.0);
@@ -132,6 +133,7 @@ namespace ar_pose
     }
     arParamChangeSize (&wparam, xsize_, ysize_, &cam_param_);
     arInitCparam (&cam_param_);
+
     ROS_INFO ("*** Camera Parameter ***");
     arParamDisp (&cam_param_);
 
@@ -199,9 +201,9 @@ namespace ar_pose
       double arQuat[4], arPos[3];
 
       if (!useHistory_ || contF == 0)
-        arGetTransMat (&marker_info[k], marker_center_, marker_width_, marker_trans_);
+        arGetTransMat (&marker_info[k], marker_center_, markerWidth_, marker_trans_);
       else
-        arGetTransMatCont (&marker_info[k], marker_trans_, marker_center_, marker_width_, marker_trans_);
+        arGetTransMatCont (&marker_info[k], marker_trans_, marker_center_, markerWidth_, marker_trans_);
 
       contF = 1;
 
@@ -242,7 +244,7 @@ namespace ar_pose
 		  ar_pose_marker_.confidence = marker_info->cf;
 
 		  arMarkerPub_.publish(ar_pose_marker_);
-		  ROS_DEBUG ("Published ar_single marker ");
+		  ROS_DEBUG ("Published ar_single marker");
 		
       // **** publish transform between camera and marker
 
@@ -260,7 +262,7 @@ namespace ar_pose
 
       if(publishVisualMarkers_)
       {
-        btVector3 markerOrigin(0, 0, 0.01);
+        btVector3 markerOrigin(0, 0, 0.25 * markerWidth_ * AR_TO_ROS);
         btTransform m(btQuaternion::getIdentity(), markerOrigin);
         btTransform markerPose = t * m; // marker pose in the camera frame
       
@@ -270,11 +272,11 @@ namespace ar_pose
 			  rvizMarker_.header.stamp = image_msg->header.stamp;
 			  rvizMarker_.id = 1;
 
-			  rvizMarker_.scale.x = marker_width_ * AR_TO_ROS;
-			  rvizMarker_.scale.y = marker_width_ * AR_TO_ROS;
-			  rvizMarker_.scale.z = 0.02;
+			  rvizMarker_.scale.x = 2.0 * markerWidth_ * AR_TO_ROS;
+			  rvizMarker_.scale.y = 1.0 * markerWidth_ * AR_TO_ROS;
+			  rvizMarker_.scale.z = 0.5 * markerWidth_ * AR_TO_ROS;
 			  rvizMarker_.ns = "basic_shapes";
-			  rvizMarker_.type = visualization_msgs::Marker::CUBE;
+			  rvizMarker_.type = visualization_msgs::Marker::SPHERE;
 			  rvizMarker_.action = visualization_msgs::Marker::ADD;
 			  rvizMarker_.color.r = 0.0f;
 			  rvizMarker_.color.g = 1.0f;
