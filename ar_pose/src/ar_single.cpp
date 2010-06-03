@@ -22,6 +22,15 @@
 
 #include "ar_pose/ar_single.h"
 
+int main (int argc, char **argv)
+{
+  ros::init (argc, argv, "ar_single");
+  ros::NodeHandle n;
+  ar_pose::ARSinglePublisher arSingle(n);
+  ros::spin();
+  return 0;
+}
+
 namespace ar_pose
 {
   ARSinglePublisher::ARSinglePublisher (ros::NodeHandle & n):n_ (n), it_ (n_)
@@ -79,10 +88,8 @@ namespace ar_pose
     
     // **** advertsie 
 
-    armarker_pub_ = n_.advertise<ar_pose::ARMarker>("ar_pose_marker", 0);
-
-    rviz_marker_pub_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 0);
-    shape = visualization_msgs::Marker::CUBE;
+    arMarkerPub_   = n_.advertise<ar_pose::ARMarker>("ar_pose_marker", 0);
+    rvizMarkerPub_ = n_.advertise<visualization_msgs::Marker>("visualization_marker", 0);
   }
 
   ARSinglePublisher::~ARSinglePublisher (void)
@@ -100,7 +107,7 @@ namespace ar_pose
       xsize_ = cam_info_.width;
       ysize_ = cam_info_.height;
       ROS_INFO ("Image size (x,y) = (%d,%d)", xsize_, ysize_);
-      arInit ();
+      arInit();
 
       ROS_INFO ("Subscribing to image topic");
       cam_sub_ = it_.subscribe (cameraImageTopic_, 1, &ARSinglePublisher::getTransformationCallback, this);
@@ -163,7 +170,7 @@ namespace ar_pose
     if (arDetectMarker (dataPtr, threshold_, &marker_info, &marker_num) < 0)
     {
       ROS_FATAL ("arDetectMarker failed");
-      ROS_BREAK ();             // FIX: I don't think this should be fatal... -Bill
+      ROS_BREAK ();             // FIXME: I don't think this should be fatal... -Bill
     }
 
     // check for known patterns
@@ -182,9 +189,7 @@ namespace ar_pose
       }
     }
 
-    if (k == -1)
-      contF = 0;
-    else if (k != -1)
+    if (k != -1)
     {
       // **** get the transformation between the marker and the real camera
       double quat[4], pos[3];
@@ -219,20 +224,16 @@ namespace ar_pose
 		
 		  ar_pose_marker_.confidence = marker_info->cf;
 
-		  armarker_pub_.publish(ar_pose_marker_);
+		  arMarkerPub_.publish(ar_pose_marker_);
 		  ROS_DEBUG ("Published ar_single marker ");
 		
       // **** publish transform between camera and marker
 
       if(publishTf_)
       {
-        btTransform t;
-
         btQuaternion rotation (quat[0], quat[1], quat[2], quat[3]);
         btVector3 origin(pos[0]/1000, pos[1]/1000, pos[2]/1000);
-        t.setRotation (rotation);
-        t.setOrigin (origin);
-
+        btTransform t(rotation, origin);
         tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, "ar_single");
         broadcaster_.sendTransform(camToMarker);
       }
@@ -241,44 +242,38 @@ namespace ar_pose
 
       if(publishVisualMarkers_)
       {
-			  rviz_marker_.header.frame_id = image_msg->header.frame_id;
-			  rviz_marker_.header.stamp = ros::Time::now();
-			  rviz_marker_.ns = "basic_shapes";
-			  rviz_marker_.id = 1;
-			  rviz_marker_.type = shape;
-			  rviz_marker_.action = visualization_msgs::Marker::ADD;
-			  rviz_marker_.pose.position.x = pos[0];
-			  rviz_marker_.pose.position.y = pos[1];
-			  rviz_marker_.pose.position.z = pos[2];
-			  rviz_marker_.pose.orientation.x = quat[0];
-			  rviz_marker_.pose.orientation.y = quat[1];
-			  rviz_marker_.pose.orientation.z = quat[2];
-			  rviz_marker_.pose.orientation.w = quat[3];
-			  rviz_marker_.scale.x = 0.5;
-			  rviz_marker_.scale.y = 0.5;
-			  rviz_marker_.scale.z = 0.05;
-			  rviz_marker_.color.r = 0.0f;
-			  rviz_marker_.color.g = 1.0f;
-			  rviz_marker_.color.b = 0.0f;
-			  rviz_marker_.color.a = 1.0;
-			  rviz_marker_.lifetime = ros::Duration();
+			  rvizMarker_.header.frame_id = image_msg->header.frame_id;
+			  rvizMarker_.header.stamp = ros::Time::now();
+			  rvizMarker_.id = 1;
+			  rvizMarker_.pose.position.x = pos[0]/1000.0;
+			  rvizMarker_.pose.position.y = pos[1]/1000.0;
+			  rvizMarker_.pose.position.z = pos[2]/1000.0;
+			  rvizMarker_.pose.orientation.x = quat[0];
+			  rvizMarker_.pose.orientation.y = quat[1];
+			  rvizMarker_.pose.orientation.z = quat[2];
+			  rvizMarker_.pose.orientation.w = quat[3];
+
+			  rvizMarker_.scale.x = 0.5;
+			  rvizMarker_.scale.y = 0.5;
+			  rvizMarker_.scale.z = 0.05;
+			  rvizMarker_.ns = "basic_shapes";
+			  rvizMarker_.type = visualization_msgs::Marker::CUBE;
+			  rvizMarker_.action = visualization_msgs::Marker::ADD;
+			  rvizMarker_.color.r = 0.0f;
+			  rvizMarker_.color.g = 1.0f;
+			  rvizMarker_.color.b = 0.0f;
+			  rvizMarker_.color.a = 1.0;
+			  rvizMarker_.lifetime = ros::Duration();
 			
-			  rviz_marker_pub_.publish(rviz_marker_);
+			  rvizMarkerPub_.publish(rvizMarker_);
 			  ROS_DEBUG ("Published visual marker");
       }
     }
     else
     {
+      contF = 0;
       ROS_DEBUG ("Failed to locate marker");
     }
   }
 }                               // end namespace ar_pose
 
-int main (int argc, char **argv)
-{
-  ros::init (argc, argv, "ar_single");
-  ros::NodeHandle n;
-  ar_pose::ARSinglePublisher arSingle(n);
-  ros::spin();
-  return 0;
-}

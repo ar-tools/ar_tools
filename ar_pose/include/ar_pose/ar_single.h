@@ -65,16 +65,14 @@ namespace ar_pose
     ros::NodeHandle n_;
     ros::Subscriber sub_;
     tf::TransformBroadcaster broadcaster_;
-    ros::Publisher armarker_pub_;
+    ros::Publisher arMarkerPub_;
 
-    ros::Publisher rviz_marker_pub_;
     geometry_msgs::TransformStamped transform_;
     ar_pose::ARMarker ar_pose_marker_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber cam_sub_;
     sensor_msgs::CvBridge bridge_;
     sensor_msgs::CameraInfo cam_info_;
-    visualization_msgs::Marker rviz_marker_;
 
     // **** parameters
 
@@ -84,7 +82,6 @@ namespace ar_pose
     bool useHistory_;
     int threshold_;
 
-    uint32_t shape; 
     ARParam cam_param_;         // Camera Calibration Parameters
     int patt_id_;               // AR Marker Pattern
     char cam_param_filename_[FILENAME_MAX];
@@ -94,6 +91,10 @@ namespace ar_pose
     double marker_trans_[3][4]; // Marker Transform
     int xsize_, ysize_;
 
+    // **** for visualisation in rviz
+    ros::Publisher rvizMarkerPub_;
+    visualization_msgs::Marker rvizMarker_;
+    
     int contF;
     bool getCamInfo_;
     CvSize sz_;
