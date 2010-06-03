@@ -246,11 +246,12 @@ namespace ar_pose
 		
       // **** publish transform between camera and marker
 
+      btQuaternion rotation (quat[0], quat[1], quat[2], quat[3]);
+      btVector3 origin(pos[0], pos[1], pos[2]);
+      btTransform t(rotation, origin);
+
       if(publishTf_)
       {
-        btQuaternion rotation (quat[0], quat[1], quat[2], quat[3]);
-        btVector3 origin(pos[0], pos[1], pos[2]);
-        btTransform t(rotation, origin);
         tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, markerFrame_.c_str());
         broadcaster_.sendTransform(camToMarker);
       }
@@ -259,20 +260,19 @@ namespace ar_pose
 
       if(publishVisualMarkers_)
       {
+        btVector3 markerOrigin(0, 0, 0.01);
+        btTransform m(btQuaternion::getIdentity(), markerOrigin);
+        btTransform markerPose = t * m; // marker pose in the camera frame
+      
+        tf::poseTFToMsg(markerPose, rvizMarker_.pose);
+
 			  rvizMarker_.header.frame_id = image_msg->header.frame_id;
-			  rvizMarker_.header.stamp = ros::Time::now();
+			  rvizMarker_.header.stamp = image_msg->header.stamp;
 			  rvizMarker_.id = 1;
-			  rvizMarker_.pose.position.x = pos[0];
-			  rvizMarker_.pose.position.y = pos[1];
-			  rvizMarker_.pose.position.z = pos[2];
-			  rvizMarker_.pose.orientation.x = quat[0];
-			  rvizMarker_.pose.orientation.y = quat[1];
-			  rvizMarker_.pose.orientation.z = quat[2];
-			  rvizMarker_.pose.orientation.w = quat[3];
 
 			  rvizMarker_.scale.x = marker_width_ * AR_TO_ROS;
 			  rvizMarker_.scale.y = marker_width_ * AR_TO_ROS;
-			  rvizMarker_.scale.z = 0.01;
+			  rvizMarker_.scale.z = 0.02;
 			  rvizMarker_.ns = "basic_shapes";
 			  rvizMarker_.type = visualization_msgs::Marker::CUBE;
 			  rvizMarker_.action = visualization_msgs::Marker::ADD;
