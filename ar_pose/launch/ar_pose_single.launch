@@ -6,16 +6,21 @@
 
 	<node name="usb_cam" pkg="usb_cam" type="usb_cam_node" respawn="false" output="log">
 		<param name="video_device" type="string" value="/dev/video1"/>
+		<param name="camera_frame_id" type="string" value="usb_cam"/>
 		<param name="io_method" type="string" value="mmap"/>
 		<param name="image_width" type="int" value="640"/>
 		<param name="image_height" type="int" value="480"/>
 		<param name="pixel_format" type="string" value="mjpeg"/>
+		<rosparam param="D">[0.075807, -0.106132, -0.008356, -0.008674, 0.0000]</rosparam>
+      <rosparam param="K">[294.471514, 0.000000, 152.439859, 0.000000, 289.487454, 110.488870, 0.000000, 0.000000, 1.000000]</rosparam>
+		<rosparam param="R">[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]</rosparam>
+		<rosparam param="P">[294.471514, 0.000000, 152.439859, 0.000000, 0.000000, 289.487454, 110.488870, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000]</rosparam>
 	</node>
 	
 	<node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false" output="screen">
 		<param name="camera_image_topic" type="string" value="/usb_cam/image_raw"/>
 		<param name="camera_info_topic" type="string" value="/usb_cam/camera_info"/>
-		<param name="marker_pattern" type="string" value="Data/patt.hiro"/>
+		<param name="marker_pattern" type="string" value="data/patt.hiro"/>
 		<param name="marker_width" type="double" value="80.0"/>
 		<param name="marker_center_x" type="double" value="0.0"/>
 		<param name="marker_center_y" type="double" value="0.0"/>
