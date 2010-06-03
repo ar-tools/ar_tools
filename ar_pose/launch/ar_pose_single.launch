@@ -5,7 +5,7 @@
     args="0 0 0.5 -1.57 0 -1.57 world usb_cam 1" />
 
 	<node name="usb_cam" pkg="usb_cam" type="usb_cam_node" respawn="false" output="log">
-		<param name="video_device" type="string" value="/dev/video1"/>
+		<param name="video_device" type="string" value="/dev/video0"/>
 		<param name="camera_frame_id" type="string" value="usb_cam"/>
 		<param name="io_method" type="string" value="mmap"/>
 		<param name="image_width" type="int" value="640"/>

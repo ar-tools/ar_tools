@@ -109,12 +109,14 @@ namespace ar_pose
     if (!getCamInfo_)
     {
       cam_info_ = (*cam_info);
+      xsize_ = cam_info_.width;
+      ysize_ = cam_info_.height;
       
       //cam_param_.mat[3][4];
       cam_param_.xsize = cam_info_.width;
       cam_param_.ysize = cam_info_.height;
       
-      cam_param_.mat[0][0] = cam_info_.P[0];
+      /*cam_param_.mat[0][0] = cam_info_.P[0];
       cam_param_.mat[1][0] = cam_info_.P[4];
       cam_param_.mat[2][0] = cam_info_.P[8];
       cam_param_.mat[0][1] = cam_info_.P[1];
@@ -127,10 +129,15 @@ namespace ar_pose
       cam_param_.mat[1][3] = cam_info_.P[7];
       cam_param_.mat[2][3] = cam_info_.P[11];
      
-     	cam_param_.dist_factor[0] = cam_info_.D[0];
+      cam_param_.dist_factor[0] = cam_info_.D[0];
 		cam_param_.dist_factor[1] = cam_info_.D[1];
 		cam_param_.dist_factor[2] = cam_info_.D[2];
 		cam_param_.dist_factor[3] = cam_info_.D[3];
+     
+     	cam_param_.dist_factor[0] = cam_info_.D[0];
+		cam_param_.dist_factor[1] = cam_info_.D[1];
+		cam_param_.dist_factor[2] = cam_info_.D[2];
+		cam_param_.dist_factor[3] = cam_info_.D[3];*/
 
       arInit();
 
@@ -146,12 +153,26 @@ namespace ar_pose
 
     // Setup the initial camera parameters
     ROS_INFO ("Loading Camera Parameters");
-    /*if (arParamLoad (cam_param_filename_, 1, &wparam) < 0)
+    if (arParamLoad (cam_param_filename_, 1, &wparam) < 0)
     {
       ROS_ERROR ("Camera parameter load error: %s", cam_param_filename_);
       ROS_BREAK ();
     }
-    arParamChangeSize (&wparam, xsize_, ysize_, &cam_param_);*/
+    arParamChangeSize (&wparam, xsize_, ysize_, &cam_param_);
+         
+    cam_param_.mat[0][0] = cam_info_.P[0];
+    cam_param_.mat[1][0] = cam_info_.P[4];
+    cam_param_.mat[2][0] = cam_info_.P[8];
+    cam_param_.mat[0][1] = cam_info_.P[1];
+    cam_param_.mat[1][1] = cam_info_.P[5];
+    cam_param_.mat[2][1] = cam_info_.P[9];
+    cam_param_.mat[0][2] = cam_info_.P[2];
+    cam_param_.mat[1][2] = cam_info_.P[6];
+    cam_param_.mat[2][2] = cam_info_.P[10];
+    cam_param_.mat[0][3] = cam_info_.P[3];
+    cam_param_.mat[1][3] = cam_info_.P[7];
+    cam_param_.mat[2][3] = cam_info_.P[11];
+    
     arInitCparam (&cam_param_);
 
     ROS_INFO ("*** Camera Parameter ***");
@@ -238,9 +259,9 @@ namespace ar_pose
       pos[1] = arPos[1] * AR_TO_ROS;
       pos[2] = arPos[2] * AR_TO_ROS;
 
-      quat[0] = arQuat[0];
-      quat[1] = arQuat[1];
-      quat[2] = arQuat[2];
+      quat[0] = -arQuat[0];
+      quat[1] = -arQuat[1];
+      quat[2] = -arQuat[2];
       quat[3] = arQuat[3];
 
       ROS_DEBUG (" QUAT: Pos x: %3.5f  y: %3.5f  z: %3.5f", pos[0], pos[1], pos[2]);
