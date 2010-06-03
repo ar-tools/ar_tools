@@ -109,9 +109,29 @@ namespace ar_pose
     if (!getCamInfo_)
     {
       cam_info_ = (*cam_info);
-      xsize_ = cam_info_.width;
-      ysize_ = cam_info_.height;
-      ROS_INFO ("Image size (x,y) = (%d,%d)", xsize_, ysize_);
+      
+      //cam_param_.mat[3][4];
+      cam_param_.xsize = cam_info_.width;
+      cam_param_.ysize = cam_info_.height;
+      
+      cam_param_.mat[0][0] = cam_info_.P[0];
+      cam_param_.mat[1][0] = cam_info_.P[4];
+      cam_param_.mat[2][0] = cam_info_.P[8];
+      cam_param_.mat[0][1] = cam_info_.P[1];
+      cam_param_.mat[1][1] = cam_info_.P[5];
+      cam_param_.mat[2][1] = cam_info_.P[9];
+      cam_param_.mat[0][2] = cam_info_.P[2];
+      cam_param_.mat[1][2] = cam_info_.P[6];
+      cam_param_.mat[2][2] = cam_info_.P[10];
+      cam_param_.mat[0][3] = cam_info_.P[3];
+      cam_param_.mat[1][3] = cam_info_.P[7];
+      cam_param_.mat[2][3] = cam_info_.P[11];
+     
+     	cam_param_.dist_factor[0] = cam_info_.D[0];
+		cam_param_.dist_factor[1] = cam_info_.D[1];
+		cam_param_.dist_factor[2] = cam_info_.D[2];
+		cam_param_.dist_factor[3] = cam_info_.D[3];
+
       arInit();
 
       ROS_INFO ("Subscribing to image topic");
@@ -126,12 +146,12 @@ namespace ar_pose
 
     // Setup the initial camera parameters
     ROS_INFO ("Loading Camera Parameters");
-    if (arParamLoad (cam_param_filename_, 1, &wparam) < 0)
+    /*if (arParamLoad (cam_param_filename_, 1, &wparam) < 0)
     {
       ROS_ERROR ("Camera parameter load error: %s", cam_param_filename_);
       ROS_BREAK ();
     }
-    arParamChangeSize (&wparam, xsize_, ysize_, &cam_param_);
+    arParamChangeSize (&wparam, xsize_, ysize_, &cam_param_);*/
     arInitCparam (&cam_param_);
 
     ROS_INFO ("*** Camera Parameter ***");
@@ -146,7 +166,7 @@ namespace ar_pose
       ROS_BREAK ();
     }
 
-    sz_ = cvSize (xsize_, ysize_);
+    sz_ = cvSize (cam_param_.xsize, cam_param_.ysize);
     capture_ = cvCreateImage (sz_, IPL_DEPTH_8U, 4);
   }
 
@@ -223,8 +243,8 @@ namespace ar_pose
       quat[2] = arQuat[2];
       quat[3] = arQuat[3];
 
-      ROS_DEBUG (" QUAT: Pos x: %3.1f  y: %3.1f  z: %3.1f", pos[0], pos[1], pos[2]);
-      ROS_DEBUG ("     Quat qx: %3.2f qy: %3.2f qz: %3.2f qw: %3.2f", quat[0], quat[1], quat[2], quat[3]);
+      ROS_DEBUG (" QUAT: Pos x: %3.5f  y: %3.5f  z: %3.5f", pos[0], pos[1], pos[2]);
+      ROS_DEBUG ("     Quat qx: %3.5f qy: %3.5f qz: %3.5f qw: %3.5f", quat[0], quat[1], quat[2], quat[3]);
 
       // **** publish the marker
 
