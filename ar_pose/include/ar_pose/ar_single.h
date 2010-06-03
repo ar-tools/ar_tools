@@ -46,6 +46,9 @@
 
 #include <ar_pose/ARMarker.h>
 
+const std::string cameraImageTopic_ = "/usb_cam/image_raw";
+const std::string cameraInfoTopic_  = "/usb_cam/camera_info";
+
 namespace ar_pose
 {
   class ARSinglePublisher
@@ -59,38 +62,42 @@ namespace ar_pose
     void getTransformationCallback (const sensor_msgs::ImageConstPtr &);
     void camInfoCallback (const sensor_msgs::CameraInfoConstPtr &);
 
-      ros::NodeHandle n_;
-      ros::Subscriber sub_;
-      tf::TransformBroadcaster broadcaster_;
-      ros::Publisher armarker_pub_;
+    ros::NodeHandle n_;
+    ros::Subscriber sub_;
+    tf::TransformBroadcaster broadcaster_;
+    ros::Publisher armarker_pub_;
 
-		ros::Publisher rviz_marker_pub_;
-      geometry_msgs::TransformStamped transform_;
-      ar_pose::ARMarker ar_pose_marker_;
-      image_transport::ImageTransport it_;
-      image_transport::Subscriber cam_sub_;
-      sensor_msgs::CvBridge bridge_;
-      sensor_msgs::CameraInfo cam_info_;
-      visualization_msgs::Marker rviz_marker_;
+    ros::Publisher rviz_marker_pub_;
+    geometry_msgs::TransformStamped transform_;
+    ar_pose::ARMarker ar_pose_marker_;
+    image_transport::ImageTransport it_;
+    image_transport::Subscriber cam_sub_;
+    sensor_msgs::CvBridge bridge_;
+    sensor_msgs::CameraInfo cam_info_;
+    visualization_msgs::Marker rviz_marker_;
+
+    // **** parameters
+
+    std::string cameraFrame_;
+    bool publishTf_;
+    bool publishVisualMarkers_;
+    bool useHistory_;
+    int threshold_;
 
     uint32_t shape; 
     ARParam cam_param_;         // Camera Calibration Parameters
     int patt_id_;               // AR Marker Pattern
-    char camera_image_topic_[FILENAME_MAX];
-    char camera_info_topic_[FILENAME_MAX];
     char cam_param_filename_[FILENAME_MAX];
     char pattern_filename_[FILENAME_MAX];
     double marker_width_;       // Size of the AR Marker in mm
     double marker_center_[2];   // Physical Center of the Marker
     double marker_trans_[3][4]; // Marker Transform
     int xsize_, ysize_;
-    int threshold_, tf_publisher_;
-    int history_mode, contF;
+
+    int contF;
     bool getCamInfo_;
     CvSize sz_;
     IplImage *capture_;
-
-
   };                            // end class ARSinglePublisher
 }                               // end namespace ar_pose
 
