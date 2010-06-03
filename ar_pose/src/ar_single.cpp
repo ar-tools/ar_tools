@@ -56,6 +56,10 @@ namespace ar_pose
       threshold_ = 100;
     ROS_INFO ("\tThreshold: %d", threshold_);
 
+    if (!n_param.getParam("marker_frame", markerFrame_))
+      markerFrame_ = "ar_marker";
+    ROS_INFO ("\tMarker frame: %s", markerFrame_.c_str());
+
     // If mode=0, we use arGetTransMat instead of arGetTransMatCont
     // The arGetTransMatCont function uses information from the previous image
     // frame to reduce the jittering of the marker
@@ -192,7 +196,7 @@ namespace ar_pose
     if (k != -1)
     {
       // **** get the transformation between the marker and the real camera
-      double quat[4], pos[3];
+      double arQuat[4], arPos[3];
 
       if (!useHistory_ || contF == 0)
         arGetTransMat (&marker_info[k], marker_center_, marker_width_, marker_trans_);
@@ -202,7 +206,20 @@ namespace ar_pose
       contF = 1;
 
       //arUtilMatInv (marker_trans_, cam_trans);
-      arUtilMat2QuatPos (marker_trans_, quat, pos);
+      arUtilMat2QuatPos (marker_trans_, arQuat, arPos);
+
+      // **** convert to ROS frame
+
+      double quat[4], pos[3];
+    
+      pos[0] = arPos[0] * AR_TO_ROS;
+      pos[1] = arPos[1] * AR_TO_ROS;
+      pos[2] = arPos[2] * AR_TO_ROS;
+
+      quat[0] = arQuat[0];
+      quat[1] = arQuat[1];
+      quat[2] = arQuat[2];
+      quat[3] = arQuat[3];
 
       ROS_DEBUG (" QUAT: Pos x: %3.1f  y: %3.1f  z: %3.1f", pos[0], pos[1], pos[2]);
       ROS_DEBUG ("     Quat qx: %3.2f qy: %3.2f qz: %3.2f qw: %3.2f", quat[0], quat[1], quat[2], quat[3]);
@@ -213,9 +230,9 @@ namespace ar_pose
 		  ar_pose_marker_.header.stamp    = image_msg->header.stamp;
 		  ar_pose_marker_.id              = marker_info->id;
 
-		  ar_pose_marker_.pose.pose.position.x = pos[0] / 1000;
-		  ar_pose_marker_.pose.pose.position.y = pos[1] / 1000;
-		  ar_pose_marker_.pose.pose.position.z = pos[2] / 1000;
+		  ar_pose_marker_.pose.pose.position.x = pos[0];
+		  ar_pose_marker_.pose.pose.position.y = pos[1];
+		  ar_pose_marker_.pose.pose.position.z = pos[2];
 
 		  ar_pose_marker_.pose.pose.orientation.x = quat[0];
 		  ar_pose_marker_.pose.pose.orientation.y = quat[1];
@@ -232,9 +249,9 @@ namespace ar_pose
       if(publishTf_)
       {
         btQuaternion rotation (quat[0], quat[1], quat[2], quat[3]);
-        btVector3 origin(pos[0]/1000, pos[1]/1000, pos[2]/1000);
+        btVector3 origin(pos[0], pos[1], pos[2]);
         btTransform t(rotation, origin);
-        tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, "ar_single");
+        tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, markerFrame_.c_str());
         broadcaster_.sendTransform(camToMarker);
       }
 
@@ -245,17 +262,17 @@ namespace ar_pose
 			  rvizMarker_.header.frame_id = image_msg->header.frame_id;
 			  rvizMarker_.header.stamp = ros::Time::now();
 			  rvizMarker_.id = 1;
-			  rvizMarker_.pose.position.x = pos[0]/1000.0;
-			  rvizMarker_.pose.position.y = pos[1]/1000.0;
-			  rvizMarker_.pose.position.z = pos[2]/1000.0;
+			  rvizMarker_.pose.position.x = pos[0];
+			  rvizMarker_.pose.position.y = pos[1];
+			  rvizMarker_.pose.position.z = pos[2];
 			  rvizMarker_.pose.orientation.x = quat[0];
 			  rvizMarker_.pose.orientation.y = quat[1];
 			  rvizMarker_.pose.orientation.z = quat[2];
 			  rvizMarker_.pose.orientation.w = quat[3];
 
-			  rvizMarker_.scale.x = 0.5;
-			  rvizMarker_.scale.y = 0.5;
-			  rvizMarker_.scale.z = 0.05;
+			  rvizMarker_.scale.x = marker_width_ * AR_TO_ROS;
+			  rvizMarker_.scale.y = marker_width_ * AR_TO_ROS;
+			  rvizMarker_.scale.z = 0.01;
 			  rvizMarker_.ns = "basic_shapes";
 			  rvizMarker_.type = visualization_msgs::Marker::CUBE;
 			  rvizMarker_.action = visualization_msgs::Marker::ADD;

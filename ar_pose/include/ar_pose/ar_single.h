@@ -49,6 +49,8 @@
 const std::string cameraImageTopic_ = "/usb_cam/image_raw";
 const std::string cameraInfoTopic_  = "/usb_cam/camera_info";
 
+const double AR_TO_ROS = 0.001;
+
 namespace ar_pose
 {
   class ARSinglePublisher
@@ -76,7 +78,8 @@ namespace ar_pose
 
     // **** parameters
 
-    std::string cameraFrame_;
+    //std::string cameraFrame_;
+    std::string markerFrame_;
     bool publishTf_;
     bool publishVisualMarkers_;
     bool useHistory_;
