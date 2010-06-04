@@ -37,6 +37,7 @@
 #include <tf/transform_broadcaster.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/CameraInfo.h>
+#include <visualization_msgs/Marker.h>
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
@@ -46,7 +47,11 @@
 #include <ros/console.h>
 #include <resource_retriever/retriever.h>
 
-#include "ar_pose/object.h"
+#include <ar_pose/ARMarkers.h>
+#include <ar_pose/ARMarker.h>
+#include <ar_pose/object.h>
+
+const double AR_TO_ROS = 0.001;
 
 namespace ar_pose
 {
@@ -65,26 +70,32 @@ namespace ar_pose
       tf::TransformBroadcaster broadcaster_;
       ros::Subscriber sub_;
       image_transport::Subscriber cam_sub_;
+      ros::Publisher arMarkerPub_;
 
-      geometry_msgs::TransformStamped transform_[OBJECT_MAX];   //OBJECT_MAX define in object.h
+      geometry_msgs::TransformStamped camToMarker_[OBJECT_MAX]; //OBJECT_MAX define in object.h
 
       image_transport::ImageTransport it_;
       sensor_msgs::CvBridge bridge_;
       sensor_msgs::CameraInfo cam_info_;
 
+    // **** for visualisation in rviz
+      ros::Publisher rvizMarkerPub_;
+      visualization_msgs::Marker rvizMarker_;
+
+    // **** parameters
     ARParam cam_param_;         // Camera Calibration Parameters
     ARMultiMarkerInfoT *config; // AR Marker Info
       ar_object::ObjectData_T * object;
     int objectnum;
-
-    char camera_image_topic_[FILENAME_MAX];
-    char camera_info_topic_[FILENAME_MAX];
-    char cam_param_filename_[FILENAME_MAX];
+    char cameraImageTopic_[FILENAME_MAX];
+    char cameraInfoTopic_[FILENAME_MAX];
     char pattern_filename_[FILENAME_MAX];
 
-    int xsize_, ysize_;
+      ar_pose::ARMarkers arPoseMarkers_;
     int threshold_;
     bool getCamInfo_;
+    bool publishTf_;
+    bool publishVisualMarkers_;
     CvSize sz_;
     IplImage *capture_;
 

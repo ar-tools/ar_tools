@@ -69,7 +69,6 @@ namespace ar_pose
     tf::TransformBroadcaster broadcaster_;
     ros::Publisher arMarkerPub_;
 
-    geometry_msgs::TransformStamped transform_;
     ar_pose::ARMarker ar_pose_marker_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber cam_sub_;
