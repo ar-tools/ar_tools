@@ -84,16 +84,14 @@ namespace ar_pose
     bool publishVisualMarkers_;
     bool useHistory_;
     int threshold_;
-    double markerWidth_;       // Size of the AR Marker in mm
+    double markerWidth_;        // Size of the AR Marker in mm
 
     ARParam cam_param_;         // Camera Calibration Parameters
     int patt_id_;               // AR Marker Pattern
-    char cam_param_filename_[FILENAME_MAX];
     char pattern_filename_[FILENAME_MAX];
 
     double marker_center_[2];   // Physical Center of the Marker
     double marker_trans_[3][4]; // Marker Transform
-    int xsize_, ysize_;
 
     // **** for visualisation in rviz
     ros::Publisher rvizMarkerPub_;

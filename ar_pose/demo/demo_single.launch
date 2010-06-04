@@ -13,11 +13,8 @@
 		<param name="marker_center_x" type="double" value="0.0"/>
 		<param name="marker_center_y" type="double" value="0.0"/>
 		<param name="threshold" type="int" value="100"/>
-    <param name="use_history" type="bool" value="true"/>
+		<param name="use_history" type="bool" value="true"/>
 	</node>
-	
-	<node name="image_view" pkg="image_view" type="image_view" 
-		args="image:=/usb_cam/image_raw" />
 	
 	<node pkg="rosbag" type="rosbag" name="rosbag" 
 		args="play $(find ar_pose)/demo/usb_cam_topics_ar_single.bag --clock -d 3"/>

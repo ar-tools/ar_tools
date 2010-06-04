@@ -11,7 +11,7 @@
 		<param name="image_width" type="int" value="640"/>
 		<param name="image_height" type="int" value="480"/>
 		<param name="pixel_format" type="string" value="mjpeg"/>
-		<rosparam param="D">[0.025751483065329935, -0.10530741936574876, -0.0024821434601277623, -0.0031632353637182972, 0.0000]</rosparam>
+		<rosparam param="D">[265.000000, 257.000000, 4.600000, 1.002303, 0.0000]</rosparam>
 		<rosparam param="K">[558.70655574536931, 0.0, 316.68428342491319, 0.0, 553.44501004322387, 238.23867473419315, 0.0, 0.0, 1.0]</rosparam>
 		<rosparam param="R">[1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]</rosparam>
 		<rosparam param="P">[558.70655574536931, 0.0, 316.68428342491319, 0.0, 0.0, 553.44501004322387, 238.23867473419315, 0.0, 0.0, 0.0, 1.0, 0.0]</rosparam>
