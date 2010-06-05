@@ -1,6 +1,6 @@
 <stack>
   <description brief="vision">CCNY Computer Vision Stack</description>
-  <author>Maintained by William Morris, Ivan Dryanovski, Gautier Dumonteil et al.</author>
+  <author>Maintained by Gautier Dumonteil, Ivan Dryanovski, William Morris et al.</author>
   <license>GPL</license>  
   <review status="unreviewed" notes=""/>
   <url>http://www.ros.org/wiki/ccny_vision</url>
