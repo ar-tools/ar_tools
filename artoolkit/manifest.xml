@@ -1,10 +1,9 @@
 <package>
 	<description brief="artoolkit">
-	     Artoolkit
+	     Artoolkit Library
 	</description>
 	<author>Gautier Dumonteil</author>
-	<license>BSD</license>
-	
+	<license>GPL</license>
 	<review status="3rdparty" notes=""/>
 	<url>http://www.hitl.washington.edu/artoolkit/</url>
 	<versioncontrol type="svn" url="https://artoolkit.svn.sourceforge.net/svnroot/artoolkit/trunk"/>
