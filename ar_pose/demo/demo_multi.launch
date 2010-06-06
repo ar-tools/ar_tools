@@ -8,8 +8,6 @@
     args="0 0 0.5 -1.57 0 -1.57 world usb_cam 100" />
 
 	<node name="ar_pose" pkg="ar_pose" type="ar_multi" respawn="false" output="screen">
-		<param name="camera_image_topic" type="string" value="/usb_cam/image_raw"/>
-		<param name="camera_info_topic" type="string" value="/usb_cam/camera_info"/>
 		<param name="marker_pattern_list" type="string" value="data/object_4x4"/>
 		<param name="threshold" type="int" value="100"/>
 	</node>

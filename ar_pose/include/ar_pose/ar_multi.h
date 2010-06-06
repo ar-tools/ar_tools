@@ -33,23 +33,24 @@
 #include <AR/arMulti.h>
 
 #include <ros/ros.h>
+#include <ros/package.h>
+#include <ros/console.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <tf/transform_broadcaster.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/CameraInfo.h>
 #include <visualization_msgs/Marker.h>
+#include <resource_retriever/retriever.h>
 
 #include <opencv/cv.h>
-#include <opencv/highgui.h>
 #include <cv_bridge/CvBridge.h>
-
-#include <ros/package.h>
-#include <ros/console.h>
-#include <resource_retriever/retriever.h>
 
 #include <ar_pose/ARMarkers.h>
 #include <ar_pose/ARMarker.h>
 #include <ar_pose/object.h>
+
+const std::string cameraImageTopic_ = "/usb_cam/image_raw";
+const std::string cameraInfoTopic_  = "/usb_cam/camera_info";
 
 const double AR_TO_ROS = 0.001;
 
@@ -72,8 +73,6 @@ namespace ar_pose
       image_transport::Subscriber cam_sub_;
       ros::Publisher arMarkerPub_;
 
-      geometry_msgs::TransformStamped camToMarker_[OBJECT_MAX]; //OBJECT_MAX define in object.h
-
       image_transport::ImageTransport it_;
       sensor_msgs::CvBridge bridge_;
       sensor_msgs::CameraInfo cam_info_;
@@ -87,8 +86,6 @@ namespace ar_pose
     ARMultiMarkerInfoT *config; // AR Marker Info
       ar_object::ObjectData_T * object;
     int objectnum;
-    char cameraImageTopic_[FILENAME_MAX];
-    char cameraInfoTopic_[FILENAME_MAX];
     char pattern_filename_[FILENAME_MAX];
 
       ar_pose::ARMarkers arPoseMarkers_;

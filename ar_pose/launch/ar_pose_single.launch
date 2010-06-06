@@ -18,8 +18,6 @@
    </node>
 	
 	<node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false" output="screen">
-		<param name="camera_image_topic" type="string" value="/usb_cam/image_raw"/>
-		<param name="camera_info_topic" type="string" value="/usb_cam/camera_info"/>
 		<param name="marker_pattern" type="string" value="data/patt.hiro"/>
 		<param name="marker_width" type="double" value="80.0"/>
 		<param name="marker_center_x" type="double" value="0.0"/>

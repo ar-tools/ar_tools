@@ -55,28 +55,6 @@ namespace ar_pose
       threshold_ = 100;
     ROS_INFO ("\tThreshold: %d", threshold_);
 
-    if (n_param.hasParam ("camera_image_topic"))
-    {
-      n_param.getParam ("camera_image_topic", local_path);
-    }
-    else
-    {
-      local_path = "/camera/image";
-    }
-    sprintf (cameraImageTopic_, "%s", local_path.c_str ());
-    ROS_INFO ("Camera Image Topic: %s", cameraImageTopic_);
-
-    if (n_param.hasParam ("camera_info_topic"))
-    {
-      n_param.getParam ("camera_info_topic", local_path);
-    }
-    else
-    {
-      local_path = "/camera/camera_info";
-    }
-    sprintf (cameraInfoTopic_, "%s", local_path.c_str ());
-    ROS_INFO ("Camera Info Topic: %s", cameraInfoTopic_);
-
     n_param.param ("marker_pattern_list", local_path, std::string ("data/object_data2"));
     sprintf (pattern_filename_, "%s/%s", package_path.c_str (), local_path.c_str ());
     ROS_INFO ("Marker Pattern Filename: %s", pattern_filename_);
@@ -90,7 +68,10 @@ namespace ar_pose
     // **** advertsie 
 
     arMarkerPub_ = n_.advertise < ar_pose::ARMarkers > ("ar_pose_marker", 0);
-    rvizMarkerPub_ = n_.advertise < visualization_msgs::Marker > ("visualization_marker", 0);
+    if(publishVisualMarkers_)
+    {
+		rvizMarkerPub_ = n_.advertise < visualization_msgs::Marker > ("visualization_marker", 0);
+	 }
   }
 
   ARSinglePublisher::~ARSinglePublisher (void)
@@ -265,19 +246,8 @@ namespace ar_pose
 
       if (publishTf_)
       {
-        camToMarker_[i].header.frame_id = image_msg->header.frame_id;
-        camToMarker_[i].child_frame_id = object[i].name;
-        camToMarker_[i].header.stamp = image_msg->header.stamp;
-        camToMarker_[i].transform.translation.x = pos[0];
-        camToMarker_[i].transform.translation.y = pos[1];
-        camToMarker_[i].transform.translation.z = pos[2];
-
-        camToMarker_[i].transform.rotation.x = quat[0];
-        camToMarker_[i].transform.rotation.y = quat[1];
-        camToMarker_[i].transform.rotation.z = quat[2];
-        camToMarker_[i].transform.rotation.w = quat[3];
-
-        broadcaster_.sendTransform (camToMarker_[i]);
+			tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, object[i].name);
+			broadcaster_.sendTransform(camToMarker);
       }
 
       // **** publish visual marker
