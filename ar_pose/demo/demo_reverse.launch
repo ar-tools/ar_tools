@@ -18,6 +18,6 @@
 	</node>
 	
 	<node pkg="rosbag" type="rosbag" name="rosbag" 
-		args="play $(find ar_pose)/demo/usb_cam_topics_ar_single.bag --clock -d 3"/>
+		args="play $(find ar_pose)/demo/usb_cam_topics_ar_reverse.bag --clock -d 3"/>
 	
 </launch>
