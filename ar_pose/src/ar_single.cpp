@@ -270,7 +270,7 @@ namespace ar_pose
       {
         if(reverse_transform_)
         {
-          tf::StampedTransform markerToCam (t, image_msg->header.stamp, markerFrame_.c_str(), image_msg->header.frame_id);
+          tf::StampedTransform markerToCam (t.inverse(), image_msg->header.stamp, markerFrame_.c_str(), image_msg->header.frame_id);
           broadcaster_.sendTransform(markerToCam);
         } else {
           tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, markerFrame_.c_str());
