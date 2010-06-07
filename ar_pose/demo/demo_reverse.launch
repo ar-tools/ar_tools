@@ -14,7 +14,7 @@
 		<param name="marker_center_y" type="double" value="0.0"/>
 		<param name="threshold" type="int" value="100"/>
 		<param name="use_history" type="bool" value="true"/>
-    <param nake="reverse_transform" type="bool" value="true"/>
+    <param name="reverse_transform" type="bool" value="true"/>
 	</node>
 	
 	<node pkg="rosbag" type="rosbag" name="rosbag" 
