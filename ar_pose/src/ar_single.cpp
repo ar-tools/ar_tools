@@ -60,6 +60,10 @@ namespace ar_pose
       markerWidth_ = 80.0;
     ROS_INFO ("\tMarker Width: %.1f", markerWidth_);
 
+    if (!n_param.getParam("reverse_transform", reverse_transform_))
+      reverse_transform_ = false;
+    ROS_INFO("\tReverse Transform: %d", reverse_transform_);
+
     if (!n_param.getParam("marker_frame", markerFrame_))
       markerFrame_ = "ar_marker";
     ROS_INFO ("\tMarker frame: %s", markerFrame_.c_str());
@@ -264,8 +268,14 @@ namespace ar_pose
 
       if(publishTf_)
       {
-        tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, markerFrame_.c_str());
-        broadcaster_.sendTransform(camToMarker);
+        if(reverse_transform_)
+        {
+          tf::StampedTransform markerToCam (t, image_msg->header.stamp, markerFrame_.c_str(), image_msg->header.frame_id);
+          broadcaster_.sendTransform(markerToCam);
+        } else {
+          tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, markerFrame_.c_str());
+          broadcaster_.sendTransform(camToMarker);
+        }
       }
 
       // **** publish visual marker

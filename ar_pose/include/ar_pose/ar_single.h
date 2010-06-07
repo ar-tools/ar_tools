@@ -88,6 +88,7 @@ namespace ar_pose
     ARParam cam_param_;         // Camera Calibration Parameters
     int patt_id_;               // AR Marker Pattern
     char pattern_filename_[FILENAME_MAX];
+    bool reverse_transform_;    // Reverse direction of transform marker -> cam
 
     double marker_center_[2];   // Physical Center of the Marker
     double marker_trans_[3][4]; // Marker Transform
