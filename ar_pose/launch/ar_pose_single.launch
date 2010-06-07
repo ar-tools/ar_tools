@@ -1,8 +1,11 @@
 <launch>
-	<node pkg="rviz" type="rviz" name="rviz"/>
+  <param name="use_sim_time" value="false"/>
+
+	<node pkg="rviz" type="rviz" name="rviz" 
+	  args="-d $(find ar_pose)/launch/live_single.vcg"/>
 		    
    <node pkg="tf" type="static_transform_publisher" name="world_to_cam" 
-     args="0 0 0.5 -1.57 0 -1.57 world usb_cam 1" />
+     args="1 1 0.3 0 0 0 world ar_marker 10" />
 
 	<node name="usb_cam" pkg="usb_cam" type="usb_cam_node" respawn="false" output="log">
 		<param name="video_device" type="string" value="/dev/video0"/>
