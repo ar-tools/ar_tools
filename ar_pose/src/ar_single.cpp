@@ -126,8 +126,8 @@ namespace ar_pose
       cam_param_.mat[1][3] = cam_info_.P[7];
       cam_param_.mat[2][3] = cam_info_.P[11];
      
-      /* FIXME : don't work with ROS distortion factor
-      * ROS Calibration : D=[0.025751483065329935, -0.10530741936574876,
+      /* FIXME : don't work with OpenCV or Matlab distortion factor
+      * OpenCV Calibration : D=[0.025751483065329935, -0.10530741936574876,
 		*	-0.0024821434601277623, -0.0031632353637182972, 0.0000]
 		* ARToolkit Calibration : D=[265.000000, 257.000000, 4.600000,
 		*	1.002303, 0.0000]*/
