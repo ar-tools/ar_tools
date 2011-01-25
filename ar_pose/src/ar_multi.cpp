@@ -103,8 +103,8 @@ namespace ar_pose
       cam_param_.mat[1][3] = cam_info_.P[7];
       cam_param_.mat[2][3] = cam_info_.P[11];
 
-      cam_param_.dist_factor[0] = cam_info_.K[3];       // x0 = cX from openCV calibration
-      cam_param_.dist_factor[1] = cam_info_.K[6];       // y0 = cY from openCV calibration
+      cam_param_.dist_factor[0] = cam_info_.K[2];       // x0 = cX from openCV calibration
+      cam_param_.dist_factor[1] = cam_info_.K[5];       // y0 = cY from openCV calibration
       cam_param_.dist_factor[2] = -100*cam_info_.D[0];  // f = -100*k1 from CV. Note, we had to do mm^2 to m^2, hence 10^8->10^2
       cam_param_.dist_factor[3] = 1.0;                  // scale factor, should probably be >1, but who cares...
       
