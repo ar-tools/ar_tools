@@ -1,5 +1,5 @@
 <stack>
-  <description brief="vision">CCNY Computer Vision Stack</description>
+  <description brief="CCNY Computer Vision">CCNY Computer Vision Stack</description>
   <author>Maintained by Gautier Dumonteil, Ivan Dryanovski, William Morris et al.</author>
   <license>GPL</license>  
   <review status="experimental" notes=""/>
