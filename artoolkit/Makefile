@@ -1,25 +1,30 @@
 all: installed
 
-SVN_DIR = build/artoolkit-svn
-SVN_URL = https://artoolkit.svn.sourceforge.net/svnroot/artoolkit/trunk/artoolkit
-SVN_REVISION = -r 311
-include $(shell rospack find mk)/svn_checkout.mk
+TARBALL     = build/ARToolKit-SVN-r311.tar.gz
+TARBALL_URL = https://code.ros.org/svn/release/download/thirdparty/ARToolKit-SVN-r311.tar.gz
+UNPACK_CMD  = tar zxf
+SOURCE_DIR  = build/artoolkit
+#TARBALL_PATCH = matrix.patch
+MD5SUM_FILE = ARToolKit-SVN-r311.tar.gz.md5sum
 
-installed: $(SVN_DIR) patched
-	cp patch_v4l $(SVN_DIR)/Configure
-	#Build Artoolkit with GStreamer change ligne below with: cd $(SVN_DIR) && ./Configure 5 y y y 
+include $(shell rospack find mk)/download_unpack_build.mk
+
+installed: $(SOURCE_DIR)/unpacked
+	cp patch_v4l $(SOURCE_DIR)/Configure
+	#Build Artoolkit with GStreamer change ligne below with: cd $(SOURCE_DIR) && ./Configure 5 y y y 
 	#Currently build with V4L
-	cd $(SVN_DIR) && ./Configure 1 n n n
-	cd $(SVN_DIR) && make
+	cd $(SOURCE_DIR) && ./Configure 1 n n n
+	cd $(SOURCE_DIR) && make
 	mkdir -p $(CURDIR)/lib
-	cp -r $(CURDIR)/$(SVN_DIR)/lib/* $(CURDIR)/lib/
+	cp -r $(CURDIR)/$(SOURCE_DIR)/lib/* $(CURDIR)/lib/
 	mkdir -p $(CURDIR)/include
-	cp -r $(CURDIR)/$(SVN_DIR)/include/* $(CURDIR)/include/
+	cp -r $(CURDIR)/$(SOURCE_DIR)/include/* $(CURDIR)/include/
 	touch installed
 
 clean:
-	-cd $(SVN_DIR) && make clean
+	-cd $(SOURCE_DIR) && make clean
 	rm -rf $(CURDIR)/lib $(CURDIR)/include stage installed patched 
 
 wipe: clean
-	rm -rf $(SVN_DIR)
+	rm -rf $(SOURCE_DIR)
+	rm -rf build
