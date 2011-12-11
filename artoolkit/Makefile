@@ -16,13 +16,13 @@ installed: $(SOURCE_DIR)/unpacked
 	cd $(SOURCE_DIR) && ./Configure 1 n n n
 	cd $(SOURCE_DIR) && make
 	mkdir -p $(CURDIR)/lib
-	cp -r $(CURDIR)/$(SOURCE_DIR)/lib/* $(CURDIR)/lib/
+	cp -r $(CURDIR)/$(SOURCE_DIR)/lib/*.a $(CURDIR)/lib/
 	mkdir -p $(CURDIR)/include
 	cp -r $(CURDIR)/$(SOURCE_DIR)/include/* $(CURDIR)/include/
 	touch installed
 
 clean:
-	-cd $(SOURCE_DIR) && make clean
+	cd $(SOURCE_DIR) && make clean
 	rm -rf $(CURDIR)/lib $(CURDIR)/include stage installed patched 
 
 wipe: clean
