@@ -14,6 +14,8 @@ installed: $(SOURCE_DIR)/unpacked
 	#Currently build with V4L
 	cd $(SOURCE_DIR) && ./Configure 1 n n n
 	cd $(SOURCE_DIR) && make
+	#remove .svn folders from SOURCE_DIR
+	cd $(SOURCE_DIR) && rm -rf `find . -type d -name .svn`
 	mkdir -p $(CURDIR)/lib
 	cp -r $(CURDIR)/$(SOURCE_DIR)/lib/*.a $(CURDIR)/lib/
 	mkdir -p $(CURDIR)/include
