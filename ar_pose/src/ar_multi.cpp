@@ -232,7 +232,7 @@ namespace ar_pose
       ar_pose_marker.pose.pose.orientation.z = quat[2];
       ar_pose_marker.pose.pose.orientation.w = quat[3];
 
-      ar_pose_marker.confidence = marker_info->cf;
+      ar_pose_marker.confidence = round(marker_info->cf * 100);
       arPoseMarkers_.markers.push_back (ar_pose_marker);
 
       // **** publish transform between camera and marker
