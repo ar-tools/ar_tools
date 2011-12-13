@@ -38,6 +38,7 @@ namespace ar_pose
   {
     std::string local_path;
     std::string package_path = ros::package::getPath (ROS_PACKAGE_NAME);
+	std::string default_path = "data/object_4x4";
     ros::NodeHandle n_param ("~");
     XmlRpc::XmlRpcValue xml_marker_center;
 
@@ -54,11 +55,18 @@ namespace ar_pose
     if (!n_param.getParam ("threshold", threshold_))
       threshold_ = 100;
     ROS_INFO ("\tThreshold: %d", threshold_);
-
-    n_param.param ("marker_pattern_list", local_path, std::string ("data/object_data2"));
-    sprintf (pattern_filename_, "%s/%s", package_path.c_str (), local_path.c_str ());
-    ROS_INFO ("Marker Pattern Filename: %s", pattern_filename_);
-
+	
+	n_param.param ("marker_pattern_list", local_path, default_path);
+	if (local_path.compare(0,5,"data/") == 0){
+	  //according to previous implementations
+	  sprintf (pattern_filename_, "%s/%s", package_path.c_str (), local_path.c_str ());
+	}
+	else{
+	  //for new implementations, can pass a path outside the package_path
+	  sprintf (pattern_filename_, "%s", local_path.c_str ());
+	}
+	ROS_INFO ("Marker Pattern Filename: %s", pattern_filename_);
+	
     // **** subscribe
 
     ROS_INFO ("Subscribing to info topic");
