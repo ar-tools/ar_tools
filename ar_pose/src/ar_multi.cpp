@@ -58,7 +58,7 @@ namespace ar_pose
 	
 	n_param.param ("marker_pattern_list", local_path, default_path);
 	if (local_path.compare(0,5,"data/") == 0){
-	  //according to previous implementations
+	  //according to previous implementations, check if first 5 chars equal "data/"
 	  sprintf (pattern_filename_, "%s/%s", package_path.c_str (), local_path.c_str ());
 	}
 	else{
