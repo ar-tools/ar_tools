@@ -8,7 +8,7 @@
      args="1 1 0.3 0 0 0 world ar_marker 10" />
 
 	<node name="ar_pose" pkg="ar_pose" type="ar_single" respawn="false" output="screen">
-		<param name="marker_pattern" type="string" value="data/patt.hiro"/>
+		<param name="marker_pattern" type="string" value="$(find ar_pose)/data/patt.hiro"/>
 		<param name="marker_width" type="double" value="80.0"/>
 		<param name="marker_center_x" type="double" value="0.0"/>
 		<param name="marker_center_y" type="double" value="0.0"/>

@@ -37,6 +37,7 @@ namespace ar_pose
   {
     std::string local_path;
     std::string package_path = ros::package::getPath (ROS_PACKAGE_NAME);
+	std::string default_path = "data/patt.hiro";
     ros::NodeHandle n_param ("~");
     XmlRpc::XmlRpcValue xml_marker_center;
 
@@ -75,9 +76,20 @@ namespace ar_pose
       useHistory_ = true;
     ROS_INFO("\tUse history: %d", useHistory_);
 
-    n_param.param ("marker_pattern", local_path, std::string ("data/patt.hiro"));
-    sprintf (pattern_filename_, "%s/%s", package_path.c_str (), local_path.c_str ());
-    ROS_INFO ("\tMarker Pattern Filename: %s", pattern_filename_);
+//     n_param.param ("marker_pattern", local_path, std::string ("data/patt.hiro"));
+//     sprintf (pattern_filename_, "%s/%s", package_path.c_str (), local_path.c_str ());
+//     ROS_INFO ("\tMarker Pattern Filename: %s", pattern_filename_);
+
+	//modifications to allow patterns to be loaded from outside the package
+	n_param.param ("marker_pattern", local_path, default_path);
+	if (local_path.compare(0,5,"data/") == 0){
+	  //to keep working on previous implementations, check if first 5 chars equal "data/"
+	  sprintf (pattern_filename_, "%s/%s", package_path.c_str (), local_path.c_str ());
+	}
+	else{
+	  //for new implementations, can pass a path outside the package_path
+	  sprintf (pattern_filename_, "%s", local_path.c_str ());
+	}
 
     n_param.param ("marker_center_x", marker_center_[0], 0.0);
     n_param.param ("marker_center_y", marker_center_[1], 0.0);
