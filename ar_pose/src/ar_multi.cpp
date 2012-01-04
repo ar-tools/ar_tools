@@ -56,6 +56,7 @@ namespace ar_pose
       threshold_ = 100;
     ROS_INFO ("\tThreshold: %d", threshold_);
 	
+	//modifications to allow path list from outside the package
 	n_param.param ("marker_pattern_list", local_path, default_path);
 	if (local_path.compare(0,5,"data/") == 0){
 	  //according to previous implementations, check if first 5 chars equal "data/"
