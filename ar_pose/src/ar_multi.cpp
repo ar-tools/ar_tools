@@ -296,7 +296,7 @@ namespace ar_pose
             rvizMarker_.color.b = 0.0f;
             rvizMarker_.color.a = 1.0;
         }
-        rvizMarker_.lifetime = ros::Duration ();
+        rvizMarker_.lifetime = ros::Duration (1.0);
 
         rvizMarkerPub_.publish (rvizMarker_);
         ROS_DEBUG ("Published visual marker");
