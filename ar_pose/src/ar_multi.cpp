@@ -1,9 +1,11 @@
 /*
  *  Multi Marker Pose Estimation using ARToolkit
+ *  Copyright (C) 2013, I Heart Engineering
  *  Copyright (C) 2010, CCNY Robotics Lab
+ *  William Morris <bill@iheartengineering.com>
  *  Ivan Dryanovski <ivan.dryanovski@gmail.com>
- *  William Morris <morris@ee.ccny.cuny.edu>
  *  Gautier Dumonteil <gautier.dumonteil@gmail.com>
+ *  http://www.iheartengineering.com
  *  http://robotics.ccny.cuny.edu
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -25,16 +27,16 @@
 
 int main (int argc, char **argv)
 {
-  ros::init (argc, argv, "ar_single");
+  ros::init (argc, argv, "ar_multi");
   ros::NodeHandle n;
-  ar_pose::ARSinglePublisher ar_single (n);
+  ar_pose::ARMultiPublisher ar_multi (n);
   ros::spin ();
   return 0;
 }
 
 namespace ar_pose
 {
-  ARSinglePublisher::ARSinglePublisher (ros::NodeHandle & n):n_ (n), it_ (n_)
+  ARMultiPublisher::ARMultiPublisher (ros::NodeHandle & n):n_ (n), it_ (n_)
   {
     std::string local_path;
     std::string package_path = ros::package::getPath (ROS_PACKAGE_NAME);
@@ -71,26 +73,26 @@ namespace ar_pose
     // **** subscribe
 
     ROS_INFO ("Subscribing to info topic");
-    sub_ = n_.subscribe (cameraInfoTopic_, 1, &ARSinglePublisher::camInfoCallback, this);
+    sub_ = n_.subscribe (cameraInfoTopic_, 1, &ARMultiPublisher::camInfoCallback, this);
     getCamInfo_ = false;
 
-    // **** advertsie 
+    // **** advertse 
 
     arMarkerPub_ = n_.advertise < ar_pose::ARMarkers > ("ar_pose_marker", 0);
     if(publishVisualMarkers_)
     {
-		rvizMarkerPub_ = n_.advertise < visualization_msgs::Marker > ("visualization_marker", 0);
-	 }
+      rvizMarkerPub_ = n_.advertise < visualization_msgs::Marker > ("visualization_marker", 0);
+    }
   }
 
-  ARSinglePublisher::~ARSinglePublisher (void)
+  ARMultiPublisher::~ARMultiPublisher (void)
   {
     //cvReleaseImage(&capture_); //Don't know why but crash when release the image
     arVideoCapStop ();
     arVideoClose ();
   }
 
-  void ARSinglePublisher::camInfoCallback (const sensor_msgs::CameraInfoConstPtr & cam_info)
+  void ARMultiPublisher::camInfoCallback (const sensor_msgs::CameraInfoConstPtr & cam_info)
   {
     if (!getCamInfo_)
     {
@@ -120,12 +122,12 @@ namespace ar_pose
       arInit ();
 
       ROS_INFO ("Subscribing to image topic");
-      cam_sub_ = it_.subscribe (cameraImageTopic_, 1, &ARSinglePublisher::getTransformationCallback, this);
+      cam_sub_ = it_.subscribe (cameraImageTopic_, 1, &ARMultiPublisher::getTransformationCallback, this);
       getCamInfo_ = true;
     }
   }
 
-  void ARSinglePublisher::arInit ()
+  void ARMultiPublisher::arInit ()
   {
     arInitCparam (&cam_param_);
     ROS_INFO ("*** Camera Parameter ***");
@@ -137,10 +139,16 @@ namespace ar_pose
     ROS_DEBUG ("Objectfile num = %d", objectnum);
 
     sz_ = cvSize (cam_param_.xsize, cam_param_.ysize);
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+// FIXME: Why is this not in the object
+    cv_bridge::CvImagePtr capture_; 
+#else
+// DEPRECATED: Fuerte support ends when Hydro is released
     capture_ = cvCreateImage (sz_, IPL_DEPTH_8U, 4);
+#endif
   }
 
-  void ARSinglePublisher::getTransformationCallback (const sensor_msgs::ImageConstPtr & image_msg)
+  void ARMultiPublisher::getTransformationCallback (const sensor_msgs::ImageConstPtr & image_msg)
   {
     ARUint8 *dataPtr;
     ARMarkerInfo *marker_info;
@@ -151,16 +159,27 @@ namespace ar_pose
      * NOTE: the dataPtr format is BGR because the ARToolKit library was
      * build with V4L, dataPtr format change according to the 
      * ARToolKit configure option (see config.h).*/
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+    try
+    {
+      capture_ = cv_bridge::toCvCopy (image_msg, sensor_msgs::image_encodings::BGR8);
+    }
+    catch (cv_bridge::Exception& e)
+    {
+      ROS_ERROR("cv_bridge exception: %s", e.what()); 
+    }
+    dataPtr = (ARUint8 *) ((IplImage) capture_->image).imageData;
+#else
     try
     {
       capture_ = bridge_.imgMsgToCv (image_msg, "bgr8");
     }
     catch (sensor_msgs::CvBridgeException & e)
     {
-      ROS_ERROR ("Could not convert from '%s' to 'bgr8'.", image_msg->encoding.c_str ());
+      ROS_ERROR("cv_bridge exception: %s", e.what()); 
     }
-    //cvConvertImage(capture,capture,CV_CVTIMG_FLIP);
     dataPtr = (ARUint8 *) capture_->imageData;
+#endif
 
     // detect the markers in the video frame
     if (arDetectMarker (dataPtr, threshold_, &marker_info, &marker_num) < 0)
@@ -246,23 +265,37 @@ namespace ar_pose
 
       // **** publish transform between camera and marker
 
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+      tf::Quaternion rotation (quat[0], quat[1], quat[2], quat[3]);
+      tf::Vector3 origin (pos[0], pos[1], pos[2]);
+      tf::Transform t (rotation, origin);
+#else
+// DEPRECATED: Fuerte support ends when Hydro is released
       btQuaternion rotation (quat[0], quat[1], quat[2], quat[3]);
       btVector3 origin (pos[0], pos[1], pos[2]);
       btTransform t (rotation, origin);
+#endif
 
       if (publishTf_)
       {
-			tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, object[i].name);
-			broadcaster_.sendTransform(camToMarker);
+        tf::StampedTransform camToMarker (t, image_msg->header.stamp, image_msg->header.frame_id, object[i].name);
+        broadcaster_.sendTransform(camToMarker);
       }
 
       // **** publish visual marker
 
       if (publishVisualMarkers_)
       {
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+        tf::Vector3 markerOrigin (0, 0, 0.25 * object[i].marker_width * AR_TO_ROS);
+        tf::Transform m (tf::Quaternion::getIdentity (), markerOrigin);
+        tf::Transform markerPose = t * m; // marker pose in the camera frame 
+#else
+// DEPRECATED: Fuerte support ends when Hydro is released
         btVector3 markerOrigin (0, 0, 0.25 * object[i].marker_width * AR_TO_ROS);
         btTransform m (btQuaternion::getIdentity (), markerOrigin);
         btTransform markerPose = t * m; // marker pose in the camera frame
+#endif
 
         tf::poseTFToMsg (markerPose, rvizMarker_.pose);
 
@@ -298,11 +331,11 @@ namespace ar_pose
         }
         rvizMarker_.lifetime = ros::Duration (1.0);
 
-        rvizMarkerPub_.publish (rvizMarker_);
+        rvizMarkerPub_.publish(rvizMarker_);
         ROS_DEBUG ("Published visual marker");
       }
     }
-    arMarkerPub_.publish (arPoseMarkers_);
+    arMarkerPub_.publish(arPoseMarkers_);
     ROS_DEBUG ("Published ar_multi markers");
   }
-}                               // end namespace ar_pose
+} // end namespace ar_pose
