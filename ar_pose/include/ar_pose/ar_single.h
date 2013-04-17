@@ -1,9 +1,11 @@
 /*
  *  Single Marker Pose Estimation using ARToolkit
- *  Copyright (C) 2010 CCNY Robotics Lab
+ *  Copyright (C) 2013, I Heart Engineering
+ *  Copyright (C) 2010, CCNY Robotics Lab
+ *  William Morris <bill@iheartengineering.com>
  *  Ivan Dryanovski <ivan.dryanovski@gmail.com>
- *  William Morris <morris@ee.ccny.cuny.edu>
  *  Gautier Dumonteil <gautier.dumonteil@gmail.com>
+ *  http://www.iheartengineering.com
  *  http://robotics.ccny.cuny.edu
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -42,12 +44,24 @@
 
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
-#include <cv_bridge/CvBridge.h>
+
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+  // new cv_bridge API in Groovy
+  #include <cv_bridge/cv_bridge.h>
+  #include <sensor_msgs/image_encodings.h>
+#else
+  // Fuerte support for cv_bridge will be deprecated
+  #if defined(__GNUC__)
+    #warning "Support for the old cv_bridge API (Fuerte) is derecated and will be removed when Hydro is released."
+  #endif
+  #include <cv_bridge/CvBridge.h>
+#endif
+
 
 #include <ar_pose/ARMarker.h>
 
-const std::string cameraImageTopic_ = "/usb_cam/image_raw";
-const std::string cameraInfoTopic_  = "/usb_cam/camera_info";
+const std::string cameraImageTopic_ = "/camera/image_raw";
+const std::string cameraInfoTopic_  = "/camera/camera_info";
 
 const double AR_TO_ROS = 0.001;
 
@@ -72,7 +86,9 @@ namespace ar_pose
     ar_pose::ARMarker ar_pose_marker_;
     image_transport::ImageTransport it_;
     image_transport::Subscriber cam_sub_;
+#if ! ROS_VERSION_MINIMUM(1, 9, 0)
     sensor_msgs::CvBridge bridge_;
+#endif
     sensor_msgs::CameraInfo cam_info_;
 
     // **** parameters
@@ -100,7 +116,12 @@ namespace ar_pose
     int contF;
     bool getCamInfo_;
     CvSize sz_;
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+    cv_bridge::CvImagePtr capture_;
+#else
     IplImage *capture_;
+#endif
+
   };                            // end class ARSinglePublisher
 }                               // end namespace ar_pose
 
