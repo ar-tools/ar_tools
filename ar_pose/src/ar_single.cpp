@@ -1,9 +1,11 @@
 /*
  *  Single Marker Pose Estimation using ARToolkit
+ *  Copyright (C) 2013, I Heart Engineering
  *  Copyright (C) 2010, CCNY Robotics Lab
+ *  William Morris <bill@iheartengineering.com>
  *  Ivan Dryanovski <ivan.dryanovski@gmail.com>
- *  William Morris <morris@ee.ccny.cuny.edu>
  *  Gautier Dumonteil <gautier.dumonteil@gmail.com>
+ *  http://www.iheartengineering.com
  *  http://robotics.ccny.cuny.edu
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -168,7 +170,14 @@ namespace ar_pose
     }
 
     sz_ = cvSize (cam_param_.xsize, cam_param_.ysize);
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+// FIXME: Why is this not in the object
+    cv_bridge::CvImagePtr capture_;
+#else
+// DEPRECATED: Fuerte support ends when Hydro is released
     capture_ = cvCreateImage (sz_, IPL_DEPTH_8U, 4);
+#endif
+
   }
 
   void ARSinglePublisher::getTransformationCallback (const sensor_msgs::ImageConstPtr & image_msg)
@@ -182,16 +191,27 @@ namespace ar_pose
      * NOTE: the dataPtr format is BGR because the ARToolKit library was
      * build with V4L, dataPtr format change according to the 
      * ARToolKit configure option (see config.h).*/
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+    try
+    {
+      capture_ = cv_bridge::toCvCopy (image_msg, sensor_msgs::image_encodings::BGR8);
+    }
+    catch (cv_bridge::Exception& e)
+    {
+      ROS_ERROR("cv_bridge exception: %s", e.what());
+    }
+    dataPtr = (ARUint8 *) ((IplImage) capture_->image).imageData;
+#else
     try
     {
       capture_ = bridge_.imgMsgToCv (image_msg, "bgr8");
     }
     catch (sensor_msgs::CvBridgeException & e)
     {
-      ROS_ERROR ("Could not convert from '%s' to 'bgr8'.", image_msg->encoding.c_str ());
+      ROS_ERROR("cv_bridge exception: %s", e.what());
     }
-    //cvConvertImage(capture_,capture_,CV_CVTIMG_FLIP); //flip image
     dataPtr = (ARUint8 *) capture_->imageData;
+#endif
 
     // detect the markers in the video frame 
     if (arDetectMarker (dataPtr, threshold_, &marker_info, &marker_num) < 0)
@@ -269,9 +289,17 @@ namespace ar_pose
 		
       // **** publish transform between camera and marker
 
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+      tf::Quaternion rotation (quat[0], quat[1], quat[2], quat[3]);
+      tf::Vector3 origin (pos[0], pos[1], pos[2]);
+      tf::Transform t (rotation, origin);
+#else
+// DEPRECATED: Fuerte support ends when Hydro is released
       btQuaternion rotation (quat[0], quat[1], quat[2], quat[3]);
-      btVector3 origin(pos[0], pos[1], pos[2]);
-      btTransform t(rotation, origin);
+      btVector3 origin (pos[0], pos[1], pos[2]);
+      btTransform t (rotation, origin);
+#endif
+
 
       if(publishTf_)
       {
@@ -289,9 +317,17 @@ namespace ar_pose
 
       if(publishVisualMarkers_)
       {
-        btVector3 markerOrigin(0, 0, 0.25 * markerWidth_ * AR_TO_ROS);
-        btTransform m(btQuaternion::getIdentity(), markerOrigin);
+#if ROS_VERSION_MINIMUM(1, 9, 0)
+        tf::Vector3 markerOrigin (0, 0, 0.25 * markerWidth_ * AR_TO_ROS);
+        tf::Transform m (tf::Quaternion::getIdentity (), markerOrigin);
+        tf::Transform markerPose = t * m; // marker pose in the camera frame
+#else
+// DEPRECATED: Fuerte support ends when Hydro is released
+        btVector3 markerOrigin (0, 0, 0.25 * markerWidth_ * AR_TO_ROS);
+        btTransform m (btQuaternion::getIdentity (), markerOrigin);
         btTransform markerPose = t * m; // marker pose in the camera frame
+#endif
+
       
         tf::poseTFToMsg(markerPose, rvizMarker_.pose);
 
