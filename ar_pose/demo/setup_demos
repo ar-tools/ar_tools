@@ -1,0 +1,2 @@
+#!/bin/bash
+git clone git@github.com:IHeartEngineering/ar_data.git
