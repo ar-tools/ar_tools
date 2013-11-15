@@ -24,8 +24,7 @@ Index: Configure
  			exit 0
  		fi	
          VIDEO_DRIVER="VideoLinuxV4L"
--        CFLAG="-O -I/usr/X11R6/include"
-+        CFLAG="-O -I/usr/X11R6/include -I/usr/src/linux-headers-"$(uname -r)"/include"
+         CFLAG="-O -I/usr/X11R6/include"
          LDFLAG="-L/usr/X11R6/lib"
          ARFLAG="rs"
          RANLIB=""
