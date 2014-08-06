@@ -15,9 +15,10 @@ find_package(catkin REQUIRED
 	message_generation
 )
 
-include_directories(${catkin_INCLUDE_DIRS} include)
 
-add_message_files(FILES
+add_message_files(
+  DIRECTORY msg
+  FILES
 	ARMarker.msg
 	ARMarkers.msg
 )
@@ -26,7 +27,24 @@ generate_messages(DEPENDENCIES
 	geometry_msgs
 )
 
-catkin_package()
+catkin_package(
+  DEPENDS 
+  CATKIN_DEPENDS 
+	roscpp
+	visualization_msgs
+	artoolkit
+	geometry_msgs
+	tf
+	resource_retriever
+	image_transport
+	cv_bridge
+	message_runtime 
+  INCLUDE_DIRS include
+  LIBRARIES 
+)
+
+
+include_directories(${catkin_INCLUDE_DIRS} include)
 
 add_executable(ar_single
 	src/ar_single.cpp
@@ -36,7 +54,7 @@ target_link_libraries(ar_single
 	${catkin_LIBRARIES}
 )
 add_dependencies(ar_single
-	${CMAKE_PROJECT_NAME}_generate_messages_cpp
+	${PROJECT_NAME}_gencpp
 )
 
 add_executable(ar_multi
@@ -47,5 +65,5 @@ target_link_libraries(ar_multi
 	${catkin_LIBRARIES}
 )
 add_dependencies(ar_multi
-	${CMAKE_PROJECT_NAME}_generate_messages_cpp
+	${PROJECT_NAME}_gencpp
 )
