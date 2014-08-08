@@ -27,23 +27,6 @@ generate_messages(DEPENDENCIES
 	geometry_msgs
 )
 
-catkin_package(
-  DEPENDS 
-  CATKIN_DEPENDS 
-	roscpp
-	visualization_msgs
-	artoolkit
-	geometry_msgs
-	tf
-	resource_retriever
-	image_transport
-	cv_bridge
-	message_runtime 
-  INCLUDE_DIRS include
-  LIBRARIES 
-)
-
-
 include_directories(${catkin_INCLUDE_DIRS} include)
 
 add_executable(ar_single
@@ -54,7 +37,7 @@ target_link_libraries(ar_single
 	${catkin_LIBRARIES}
 )
 add_dependencies(ar_single
-	${PROJECT_NAME}_gencpp
+	${PROJECT_NAME}_generate_messages_cpp
 )
 
 add_executable(ar_multi
@@ -65,5 +48,5 @@ target_link_libraries(ar_multi
 	${catkin_LIBRARIES}
 )
 add_dependencies(ar_multi
-	${PROJECT_NAME}_gencpp
+	${PROJECT_NAME}_generate_messages_cpp
 )
