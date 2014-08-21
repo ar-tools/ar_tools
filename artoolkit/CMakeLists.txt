@@ -22,6 +22,7 @@ ExternalProject_Add(ARToolkit
 	# Patch
 	PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/patch_auto_config
 		COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/patch_v4l
+		COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/use-relative-include-paths-in-headers.patch
 		COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/cleanup.sh
 
 	# Configure (with V4L driver)
