@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <AR/ar.h>
+#include <artoolkit/AR/ar.h>
 #include <ros/ros.h>
 #include <ros/package.h>
 

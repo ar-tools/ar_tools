@@ -28,9 +28,9 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include <AR/param.h>
-#include <AR/ar.h>
-#include <AR/video.h>
+#include <artoolkit/AR/param.h>
+#include <artoolkit/AR/ar.h>
+#include <artoolkit/AR/video.h>
 
 #include <ros/ros.h>
 #include <ros/package.h>
