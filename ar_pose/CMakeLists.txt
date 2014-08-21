@@ -38,6 +38,7 @@ target_link_libraries(ar_single
 )
 add_dependencies(ar_single
 	${PROJECT_NAME}_generate_messages_cpp
+	${artoolkit_EXPORTED_TARGETS}
 )
 
 add_executable(ar_multi
@@ -49,4 +50,5 @@ target_link_libraries(ar_multi
 )
 add_dependencies(ar_multi
 	${PROJECT_NAME}_generate_messages_cpp
+	${artoolkit_EXPORTED_TARGETS}
 )
