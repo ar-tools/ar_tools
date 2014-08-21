@@ -5,8 +5,12 @@ project(artoolkit)
 
 find_package(catkin REQUIRED)
 
+# add forward declaration for ARToolkit target below
+add_custom_target(ARToolkit_catkin)
+
 catkin_package(
 	LIBRARIES GL glut ARgsub AR ARMulti ARvideo GL glut
+	EXPORTED_TARGETS ARToolkit_catkin
 )
 
 include(ExternalProject)
@@ -38,69 +42,15 @@ ExternalProject_Add(ARToolkit
 			${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/
 )
 
-# add ARgsub library
-add_custom_target(
-  copy_ARgsub ALL
-  COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/ARToolkit-prefix/src/ARToolkit/lib/libARgsub.a ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/libARgsub.a)
+# Resolve forward declaration
+add_dependencies(ARToolkit_catkin ARToolkit)
 
-add_library(ARgsub STATIC)
-set_target_properties(ARgsub PROPERTIES LINKER_LANGUAGE CXX)
-
-add_dependencies(ARgsub copy_ARgsub)
-add_dependencies(copy_ARgsub ARToolkit)
-
-# add AR library
-add_custom_target(
-  copy_AR ALL
-  COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/ARToolkit-prefix/src/ARToolkit/lib/libAR.a ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/libAR.a)
-
-add_library(AR STATIC)
-set_target_properties(AR PROPERTIES LINKER_LANGUAGE CXX)
-
-add_dependencies(AR copy_AR)
-add_dependencies(copy_AR ARToolkit)
-
-# add ARMulti library
-add_custom_target(
-  copy_ARMulti ALL
-  COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/ARToolkit-prefix/src/ARToolkit/lib/libARMulti.a ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/libARMulti.a)
-
-add_library(ARMulti STATIC)
-set_target_properties(ARMulti PROPERTIES LINKER_LANGUAGE CXX)
-
-add_dependencies(ARMulti copy_ARMulti)
-add_dependencies(copy_ARMulti ARToolkit)
-
-# add ARvideo library
-add_custom_target(
-  copy_ARvideo ALL
-  COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/ARToolkit-prefix/src/ARToolkit/lib/libARvideo.a ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/libARvideo.a)
-
-add_library(ARvideo STATIC)
-set_target_properties(ARvideo PROPERTIES LINKER_LANGUAGE CXX)
-
-add_dependencies(ARvideo copy_ARvideo)
-add_dependencies(copy_ARvideo ARToolkit)
-
-# add ARgsubUtil library
-add_custom_target(
-  copy_ARgsubUtil ALL
-  COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/ARToolkit-prefix/src/ARToolkit/lib/libARgsubUtil.a ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/libARgsubUtil.a)
-
-add_library(ARgsubUtil STATIC)
-set_target_properties(ARgsubUtil PROPERTIES LINKER_LANGUAGE CXX)
-
-add_dependencies(ARgsubUtil copy_ARgsubUtil)
-add_dependencies(copy_ARgsubUtil ARToolkit)
-
-
-# add ARgsub_lite library
-add_custom_target(
-  copy_ARgsub_lite ALL
-  COMMAND cmake -E copy ${CMAKE_CURRENT_BINARY_DIR}/ARToolkit-prefix/src/ARToolkit/lib/libARgsub_lite.a ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/libARgsub_lite.a)
-
-add_library(ARgsub_lite STATIC)
-set_target_properties(ARgsub_lite PROPERTIES LINKER_LANGUAGE CXX)
-
-add_dependencies(ARgsub_lite copy_ARgsub_lite)
-add_dependencies(copy_ARgsub_lite ARToolkit)
+# Add cmake targets for each library to make inter-package dependency
+# resolution possible
+foreach(library AR ARgsub ARgsub_lite ARMulti ARvideo ARgsubUtil)
+	add_library(${library} STATIC IMPORTED GLOBAL)
+	set_target_properties(${library} PROPERTIES
+		IMPORTED_LOCATION ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/lib${library}.a
+	)
+	set_target_properties(${library} PROPERTIES LINKER_LANGUAGE CXX)
+endforeach()
