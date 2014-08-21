@@ -1,0 +1,22 @@
+<package>
+  <name>ar_tools</name>
+  <version>0.0.0</version>
+  <description>
+    This metapackage contains tools for using ARToolkit within ROS.
+  </description>
+  <license>BSD</license>
+
+  <url>http://wiki.ros.org/ar_tools</url>
+
+  <author>Gautier Dumonteil</author>
+  <maintainer email="max.schwarz@online.de">Max Schwarz</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>artoolkit</run_depend>
+  <run_depend>ar_pose</run_depend>
+
+  <export>
+    <metapackage/>
+  </export>
+</package>
