@@ -31,9 +31,11 @@ ExternalProject_Add(ARToolkit
 	# Build
 	BUILD_COMMAND make
 
-	INSTALL_COMMAND cp -r include/AR ${CATKIN_DEVEL_PREFIX}/include/
+	INSTALL_COMMAND mkdir -p ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+		                 ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}
+		COMMAND cp -r include/AR ${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION}/
 		COMMAND cp -r lib/libAR.a lib/libARgsub.a lib/libARgsub_lite.a lib/libARMulti.a lib/libARvideo.a lib/libARgsubUtil.a
-			${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_LIB_DESTINATION}
+			${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_LIB_DESTINATION}/
 )
 
 # add ARgsub library
