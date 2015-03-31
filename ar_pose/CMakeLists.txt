@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ar_pose)
 
-find_package(catkin REQUIRED
+find_package(catkin REQUIRED COMPONENTS
 	roscpp
 	visualization_msgs
 	artoolkit
@@ -25,6 +25,17 @@ add_message_files(
 
 generate_messages(DEPENDENCIES
 	geometry_msgs
+)
+
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS
+    roscpp
+    geometry_msgs
+    visualization_msgs
+    artoolkit
+    message_runtime
 )
 
 include_directories(${catkin_INCLUDE_DIRS} include)
