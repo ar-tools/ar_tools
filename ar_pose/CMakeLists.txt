@@ -1,47 +1,65 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 
-# Set the build type.  Options are:
-#  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
-#  Debug          : w/ debug symbols, w/o optimization
-#  Release        : w/o debug symbols, w/ optimization
-#  RelWithDebInfo : w/ debug symbols, w/ optimization
-#  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
-set(ROS_BUILD_TYPE Debug)
+cmake_minimum_required(VERSION 2.8)
 
-rosbuild_init()
+project(ar_pose)
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+find_package(catkin REQUIRED COMPONENTS
+	roscpp
+	visualization_msgs
+	artoolkit
+	geometry_msgs
+	tf
+	resource_retriever
+	image_transport
+	cv_bridge
+	message_generation
+)
 
-#uncomment if you have defined messages
-rosbuild_genmsg()
-#uncomment if you have defined services
-#rosbuild_gensrv()
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(${PROJECT_NAME} src/example.cpp)
-#target_link_libraries(${PROJECT_NAME} another_library)
-#rosbuild_add_boost_directories()
-#rosbuild_link_boost(${PROJECT_NAME} thread)
-#rosbuild_add_executable(example examples/example.cpp)
-#target_link_libraries(example ${PROJECT_NAME})
+add_message_files(
+  DIRECTORY msg
+  FILES
+	ARMarker.msg
+	ARMarkers.msg
+)
 
-include_directories('/usr/local/include/')
-link_directories('/usr/local/lib/')
+generate_messages(DEPENDENCIES
+	geometry_msgs
+)
 
-set(ARPOSESINGLE       ar_single)
-set(ARPOSESINGLE_SRC   src/ar_single.cpp)
-set(ARPOSESINGLE_LIBS  GLU GL glut ARgsub AR ARMulti ARvideo)
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES ${PROJECT_NAME}
+  CATKIN_DEPENDS
+    roscpp
+    geometry_msgs
+    visualization_msgs
+    artoolkit
+    message_runtime
+)
 
-set(ARPOSEMULTI       ar_multi)
-set(ARPOSEMULTI_SRC   src/ar_multi.cpp src/object.cpp)
-set(ARPOSEMULTI_LIBS  GLU GL glut ARgsub AR ARMulti ARvideo)
+include_directories(${catkin_INCLUDE_DIRS} include)
 
-rosbuild_add_executable(${ARPOSESINGLE}  ${ARPOSESINGLE_SRC})
-target_link_libraries(${ARPOSESINGLE}  ${ARPOSESINGLE_LIBS})
-rosbuild_add_executable(${ARPOSEMULTI}  ${ARPOSEMULTI_SRC})
-target_link_libraries(${ARPOSEMULTI}  ${ARPOSEMULTI_LIBS})
+add_executable(ar_single
+	src/ar_single.cpp
+	src/object.cpp
+)
+target_link_libraries(ar_single
+	${catkin_LIBRARIES}
+)
+add_dependencies(ar_single
+	${PROJECT_NAME}_generate_messages_cpp
+	${artoolkit_EXPORTED_TARGETS}
+)
+
+add_executable(ar_multi
+	src/ar_multi.cpp
+	src/object.cpp
+)
+target_link_libraries(ar_multi
+	${catkin_LIBRARIES}
+)
+add_dependencies(ar_multi
+	${PROJECT_NAME}_generate_messages_cpp
+	${artoolkit_EXPORTED_TARGETS}
+)
