@@ -9,6 +9,7 @@
   <author>ARToolKit Team</author>
   <author>Gautier Dumonteil</author>
   <maintainer email="bill@neautomation.com">Bill Morris</maintainer>
+  <maintainer>Dan Lazewatsky</maintainer>
   <maintainer email="max.schwarz@online.de">Max Schwarz</maintainer>
   <url type="website">http://ros.org/wiki/artoolkit</url>
   <url type="website">http://sourceforge.net/projects/artoolkit/</url>
