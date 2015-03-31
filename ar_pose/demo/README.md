@@ -1,7 +1,8 @@
 ar_pose Demo
 ============
 These demos require bag files with recorded sensor data to run.
-Data for the demos can be download (126MB) using the supplied script
+Data for the demos can be download into the workspace directory
+(126MB) using the supplied script
   ./setup_demos
 
 demo_single.launch
