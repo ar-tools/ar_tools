@@ -12,6 +12,7 @@
   <maintainer email="bill@neautomation.com">Bill Morris</maintainer>
   <maintainer email="lazewatd@engr.oregonstate.edu">Dan Lazewatsky</maintainer>
   <maintainer email="max.schwarz@online.de">Max Schwarz</maintainer>
+  <maintainer email="procopiostein@gmail.com">Procópio Stein</maintainer>
   <url type="website">http://ros.org/wiki/ar_pose</url>
   <url type="bugtracker">https://github.com/ar-tools/ar_tools/issues</url>
   <url type="repository">https://github.com/ar-tools/ar_tools</url>
