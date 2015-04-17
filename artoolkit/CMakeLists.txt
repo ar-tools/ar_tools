@@ -21,8 +21,9 @@ ExternalProject_Add(ARToolkit
 
 	# Download
 	SVN_REPOSITORY svn://svn.code.sf.net/p/artoolkit/code/trunk/artoolkit
+	UPDATE_COMMAND echo "Do not update"
 	# Patch
-	PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/patch_auto_config
+	PATCH_COMMAND COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/patch_auto_config
 		COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/patch_v4l
 		COMMAND patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/use-relative-include-paths-in-headers.patch
 		COMMAND sh ${CMAKE_CURRENT_SOURCE_DIR}/cleanup.sh
