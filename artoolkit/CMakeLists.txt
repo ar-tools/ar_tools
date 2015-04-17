@@ -20,9 +20,7 @@ ExternalProject_Add(ARToolkit
 	BINARY_DIR ARToolkit-prefix/src/ARToolkit
 
 	# Download
-	URL http://csc.kth.se/~fevb/downloads/ARToolKit-SVN-r311.tar.gz
-	URL_MD5 2f3537f782b5506133bcc79f2daba3bb 
-
+	SVN_REPOSITORY svn://svn.code.sf.net/p/artoolkit/code/trunk/artoolkit
 	# Patch
 	PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/patch_auto_config
 		COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/patch_v4l
